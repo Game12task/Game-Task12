@@ -20,11 +20,9 @@
     .card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,0.4);}
     .title{font-weight:700;font-size:16px;}
     .desc{color:var(--muted);font-size:13px;}
-    .meta{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:auto;}
+    .meta{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:auto;}
     .btn{padding:10px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700;}
-    .open-btn{background:linear-gradient(90deg,var(--accent),#0891b2);color:#022;text-decoration:none;display:inline-block;}
-    .copy-btn{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);}
-    .small{font-size:12px;padding:8px 10px;border-radius:8px;}
+    .open-btn{background:linear-gradient(90deg,var(--accent),#0891b2);color:#022;text-decoration:none;display:inline-block;text-align:center;width:100%;}
     footer{margin-top:22px;color:var(--muted);font-size:13px;text-align:center;}
   </style>
 </head>
@@ -35,10 +33,9 @@
     <div class="logo">GT</div>
     <div>
       <h1>Game Task — عروض الاستبيانات</h1>
-      <p class="lead">اختر العرض واضغط "اذهب" لفتح الموقع أو انسخ رابط الإحالة.</p>
+      <p class="lead">اختر العرض واضغط "اذهب" لفتح الموقع وسيتم تسجيل رابط الإحالة مباشرة.</p>
     </div>
   </div>
-  <div style="min-width:220px;color:var(--muted);font-size:13px">روابطك محفوظة داخل البطاقات.</div>
 </header>
 
 <!-- مكان لإعلانات Google -->
@@ -54,7 +51,6 @@
       <div class="desc">اكمل عروض واستبيانات واحصل على نقاط.</div>
       <div class="meta">
         <a class="btn open-btn" href="https://freecash.com/r/ST6JL" target="_blank" rel="noopener noreferrer">اذهب</a>
-        <button class="btn copy-btn small" data-copy="https://freecash.com/r/ST6JL">نسخ الرابط</button>
       </div>
     </div>
 
@@ -63,7 +59,6 @@
       <div class="desc">سجل وابدأ بالعروض؛ غالبًا تعطي نقاط جيدة.</div>
       <div class="meta">
         <a class="btn open-btn" href="https://www.prizerebel.com/index.php?r=16156361" target="_blank" rel="noopener noreferrer">اذهب</a>
-        <button class="btn copy-btn small" data-copy="https://www.prizerebel.com/index.php?r=16156361">نسخ الرابط</button>
       </div>
     </div>
 
@@ -72,7 +67,6 @@
       <div class="desc">مهام مختلفة: مشاهدة، تسجيل، أفكار سريعة.</div>
       <div class="meta">
         <a class="btn open-btn" href="https://timebucks.com/?refID=227024124" target="_blank" rel="noopener noreferrer">اذهب</a>
-        <button class="btn copy-btn small" data-copy="https://timebucks.com/?refID=227024124">نسخ الرابط</button>
       </div>
     </div>
 
@@ -81,7 +75,6 @@
       <div class="desc">عروض وربح عبر تحميل وتجربة — رابط إحالة.</div>
       <div class="meta">
         <a class="btn open-btn" href="https://gemsloot.com/?aff=" target="_blank" rel="noopener noreferrer">اذهب</a>
-        <button class="btn copy-btn small" data-copy="https://gemsloot.com/?aff=">نسخ الرابط</button>
       </div>
     </div>
 
@@ -90,7 +83,6 @@
       <div class="desc">من أشهر مواقع المهام والاستبيانات.</div>
       <div class="meta">
         <a class="btn open-btn" href="https://www.idle-empire.com?r=fofsqy" target="_blank" rel="noopener noreferrer">اذهب</a>
-        <button class="btn copy-btn small" data-copy="https://www.idle-empire.com?r=fofsqy">نسخ الرابط</button>
       </div>
     </div>
 
@@ -101,14 +93,5 @@
   ملاحظة: يمكنك إضافة كود Google AdSense في الأماكن المخصصة للإعلانات.
 </footer>
 
-<script>
-document.querySelectorAll('.copy-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    const link = btn.getAttribute('data-copy');
-    navigator.clipboard.writeText(link).then(()=> alert('تم نسخ رابط الإحالة'));
-  });
-});
-</script>
-
 </body>
-</html>
+                                                       </html>
