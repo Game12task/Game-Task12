@@ -23,9 +23,25 @@
     .meta{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:auto;}
     .btn{padding:10px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700;}
     .open-btn{background:linear-gradient(90deg,var(--accent),#0891b2);color:#022;text-decoration:none;display:inline-block;text-align:center;width:100%;}
-    .gold-card{background:linear-gradient(180deg,rgba(212,175,55,0.2),rgba(212,175,55,0.1));border:1px solid rgba(212,175,55,0.6);}
-    .gold-card .title{color:var(--gold);}
-    .gold-card .counter{font-size:14px;color:var(--gold);font-weight:700;margin-bottom:10px;}
+    
+    /* البطاقة الذهبية الفخمة */
+    .gold-card{
+      background: linear-gradient(135deg, rgba(212,175,55,0.3), rgba(212,175,55,0.1));
+      border: 2px solid rgba(212,175,55,0.8);
+      border-radius:16px;
+      box-shadow: 0 10px 25px rgba(212,175,55,0.4);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    .gold-card:hover{
+      transform: translateY(-5px) scale(1.02);
+      box-shadow:0 12px 30px rgba(212,175,55,0.6);
+    }
+    .gold-card .title{color:var(--gold); font-size:18px; text-align:center;}
+    .gold-card .counter{font-size:14px;color:var(--gold);font-weight:700;margin-bottom:10px;text-align:center;}
+    .option-menu{display:none; flex-direction: column; gap:8px; margin-top:10px;}
+    .option-menu button{background:var(--gold); color:#022; font-weight:700; border-radius:8px; padding:8px;}
+    
     footer{margin-top:22px;color:var(--muted);font-size:13px;text-align:center;}
     .section-title{font-size:18px;font-weight:700;margin-bottom:10px;color:var(--accent);}
     .subgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
@@ -45,28 +61,31 @@
   </div>
 </header>
 
-<!-- قالب ذهبي للاستبيانات والمهمات -->
-<div class="card gold-card">
+<!-- البطاقة الذهبية الفخمة -->
+<div class="gold-card" id="goldCard">
   <div class="title">عروض مميزة</div>
   <div class="counter" id="pointsCounter">النقاط: 0</div>
   
-  <!-- فرع الاستبيانات -->
-  <div class="section-title">الاستبيانات</div>
-  <div class="subgrid" id="surveysGrid"></div>
+  <!-- قائمة الخيارات -->
+  <div class="option-menu" id="goldOptions">
+    <button onclick="showSection('surveysGrid')">استبيانات</button>
+    <button onclick="showSection('tasksGrid')">مهام</button>
+  </div>
   
-  <!-- فرع المهمات/الأسئلة -->
-  <div class="section-title">المهام والأسئلة</div>
-  <div class="subgrid" id="tasksGrid"></div>
+  <!-- فرع الاستبيانات -->
+  <div class="subgrid" id="surveysGrid" style="display:none;"></div>
+  
+  <!-- فرع المهمات -->
+  <div class="subgrid" id="tasksGrid" style="display:none;"></div>
 </div>
 
-<!-- مكان لإعلانات Google -->
 <div style="margin-bottom:20px; text-align:center;">
   <p style="color:var(--muted);">إعلان Google</p>
 </div>
 
 <main>
   <div class="grid" id="cardsGrid">
-
+    <!-- البطاقات الأصلية -->
     <div class="card">
       <div class="title">Freecash — استبيانات ومهام</div>
       <div class="desc">اكمل عروض واستبيانات واحصل على نقاط.</div>
@@ -74,7 +93,6 @@
         <a class="btn open-btn" href="https://freecash.com/r/ST6JL" target="_blank" rel="noopener noreferrer">اذهب</a>
       </div>
     </div>
-
     <div class="card">
       <div class="title">PrizeRebel — استبيانات ومهام</div>
       <div class="desc">سجل وابدأ بالعروض؛ غالبًا تعطي نقاط جيدة.</div>
@@ -82,7 +100,6 @@
         <a class="btn open-btn" href="https://www.prizerebel.com/index.php?r=16156361" target="_blank" rel="noopener noreferrer">اذهب</a>
       </div>
     </div>
-
     <div class="card">
       <div class="title">TimeBucks — مهام وسرعات</div>
       <div class="desc">مهام مختلفة: مشاهدة، تسجيل، أفكار سريعة.</div>
@@ -90,7 +107,6 @@
         <a class="btn open-btn" href="https://timebucks.com/?refID=227024124" target="_blank" rel="noopener noreferrer">اذهب</a>
       </div>
     </div>
-
     <div class="card">
       <div class="title">GemsLoot — عروض وكسب</div>
       <div class="desc">عروض وربح عبر تحميل وتجربة — رابط إحالة.</div>
@@ -98,7 +114,6 @@
         <a class="btn open-btn" href="https://gemsloot.com/?aff=" target="_blank" rel="noopener noreferrer">اذهب</a>
       </div>
     </div>
-
     <div class="card">
       <div class="title">Idle-Empire — مهام وألعاب</div>
       <div class="desc">من أشهر مواقع المهام والاستبيانات.</div>
@@ -106,17 +121,14 @@
         <a class="btn open-btn" href="https://www.idle-empire.com?r=fofsqy" target="_blank" rel="noopener noreferrer">اذهب</a>
       </div>
     </div>
-
   </div>
 </main>
 
-<!-- قسم من نحن -->
 <div style="margin-top:30px;">
   <h2 class="section-title">من نحن</h2>
   <p style="color:var(--muted);">Game Task هو موقع يقدم الاستبيانات والمهمات لجميع الزوار، مع نظام نقاط متكامل لمكافأة المستخدمين على نشاطهم. هدفنا هو تقديم محتوى متنوع وممتع يجمع بين التعلم والترفيه.</p>
 </div>
 
-<!-- نموذج الاتصال -->
 <div style="margin-top:20px;">
   <h2 class="section-title">اتصل بنا</h2>
   <form id="contactForm">
@@ -132,13 +144,10 @@
 </footer>
 
 <script>
-  // تحضير بيانات الاستبيانات (20 استبيان)
   const surveys = [];
   for(let i=1;i<=20;i++){
     surveys.push({title:'استبيان '+i, desc:'أجب على الاستبيان لتحصل على نقاط.'});
   }
-
-  // تحضير بيانات المهمات/الأسئلة (20 مهمة متنوعة)
   const tasks = [];
   const topics = ['ثقافي','ديني','رياضي','عام'];
   for(let i=1;i<=20;i++){
@@ -146,36 +155,40 @@
     tasks.push({title:'مهمة '+i+' ('+topic+')', desc:'أكمل هذه المهمة واحصل على نقاط.'});
   }
 
-  // عرض الاستبيانات في القالب الذهبي
   const surveysGrid = document.getElementById('surveysGrid');
-  surveys.forEach((s,i)=>{
+  surveys.forEach((s)=>{
     const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `<div class="title">${s.title}</div><div class="desc">${s.desc}</div><div class="meta"><button class="btn open-btn" onclick="addPoint()">أكمل</button></div>`;
+    card.className='card';
+    card.innerHTML=`<div class="title">${s.title}</div><div class="desc">${s.desc}</div><div class="meta"><button class="btn open-btn" onclick="addPoint()">أكمل</button></div>`;
     surveysGrid.appendChild(card);
   });
 
-  // عرض المهمات في القالب الذهبي
   const tasksGrid = document.getElementById('tasksGrid');
-  tasks.forEach((t,i)=>{
+  tasks.forEach((t)=>{
     const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `<div class="title">${t.title}</div><div class="desc">${t.desc}</div><div class="meta"><button class="btn open-btn" onclick="addPoint()">أكمل</button></div>`;
+    card.className='card';
+    card.innerHTML=`<div class="title">${t.title}</div><div class="desc">${t.desc}</div><div class="meta"><button class="btn open-btn" onclick="addPoint()">أكمل</button></div>`;
     tasksGrid.appendChild(card);
   });
 
-  // العداد الموحد
-  let points = 0;
-  function addPoint(){
-    points++;
-    document.getElementById('pointsCounter').textContent = 'النقاط: '+points;
-  }
+  let points=0;
+  function addPoint(){points++;document.getElementById('pointsCounter').textContent='النقاط: '+points;}
 
-  // نموذج الاتصال (شكلي فقط)
   document.getElementById('contactForm').addEventListener('submit', function(e){
     e.preventDefault();
     alert('تم إرسال رسالتك بنجاح!');
     this.reset();
+  });
+
+  // التحكم بعرض خيارات البطاقة الذهبية
+  const goldCard = document.getElementById('goldCard');
+  const goldOptions = document.getElementById('goldOptions');
+  function showSection(sectionId){
+    document.getElementById('surveysGrid').style.display = sectionId==='surveysGrid'?'grid':'none';
+    document.getElementById('tasksGrid').style.display = sectionId==='tasksGrid'?'grid':'none';
+  }
+  goldCard.addEventListener('click', ()=>{
+    goldOptions.style.display = goldOptions.style.display==='flex'?'none':'flex';
   });
 </script>
 
