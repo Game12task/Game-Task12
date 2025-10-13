@@ -32,13 +32,15 @@ p.lead{margin:0;color:var(--muted);font-size:13px;}
   box-shadow: 0 10px 25px rgba(212,175,55,0.4);
   transition: transform 0.3s, box-shadow 0.3s;
   cursor: pointer;
+  text-align:center;
+  padding:20px;
 }
 .gold-card:hover{
   transform: translateY(-5px) scale(1.02);
   box-shadow:0 12px 30px rgba(212,175,55,0.6);
 }
-.gold-card .title{color:var(--gold); font-size:18px; text-align:center;}
-.gold-card .counter{font-size:14px;color:var(--gold);font-weight:700;margin-bottom:10px;text-align:center;}
+.gold-card .title{color:var(--gold); font-size:18px;}
+.gold-card .counter{font-size:14px;color:var(--gold);font-weight:700;margin-top:10px;}
 
 /* القالب المستقل (Modal) */
 #goldModal{
@@ -54,7 +56,7 @@ p.lead{margin:0;color:var(--muted);font-size:13px;}
   background:var(--card);
   padding:20px;
   border-radius:12px;
-  max-width:600px;
+  max-width:800px;
   width:90%;
   max-height:80%;
   overflow-y:auto;
@@ -63,7 +65,7 @@ p.lead{margin:0;color:var(--muted);font-size:13px;}
   gap:12px;
 }
 .modal-content .title{font-size:20px;text-align:center;color:var(--gold);}
-.modal-content .modal-buttons{display:flex;gap:10px;justify-content:center;}
+.modal-content .modal-buttons{display:flex;gap:10px;justify-content:center;margin-bottom:10px;}
 .modal-content .modal-buttons button{
   flex:1;
   padding:10px;
@@ -73,6 +75,7 @@ p.lead{margin:0;color:var(--muted);font-size:13px;}
   color:#022;
   cursor:pointer;
   font-weight:700;
+  font-size:14px;
 }
 .close-btn{
   align-self:flex-end;
@@ -86,6 +89,8 @@ p.lead{margin:0;color:var(--muted);font-size:13px;}
 }
 
 .subgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:10px;}
+.question-card{background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);}
+.options button{margin-top:5px;width:100%;cursor:pointer;border-radius:6px;border:none;padding:8px;background:#06b6d4;color:#022;font-weight:700;}
 </style>
 </head>
 <body>
@@ -126,94 +131,118 @@ p.lead{margin:0;color:var(--muted);font-size:13px;}
 
 <main>
   <div class="grid" id="cardsGrid">
-    <!-- البطاقات الأصلية -->
     <div class="card">
       <div class="title">Freecash — استبيانات ومهام</div>
       <div class="desc">اكمل عروض واستبيانات واحصل على نقاط.</div>
       <div class="meta">
-        <a class="btn open-btn" href="https://freecash.com/r/ST6JL" target="_blank" rel="noopener noreferrer">اذهب</a>
+        <a class="btn open-btn" href="https://freecash.com/r/ST6JL" target="_blank">اذهب</a>
       </div>
     </div>
     <div class="card">
       <div class="title">PrizeRebel — استبيانات ومهام</div>
       <div class="desc">سجل وابدأ بالعروض؛ غالبًا تعطي نقاط جيدة.</div>
       <div class="meta">
-        <a class="btn open-btn" href="https://www.prizerebel.com/index.php?r=16156361" target="_blank" rel="noopener noreferrer">اذهب</a>
+        <a class="btn open-btn" href="https://www.prizerebel.com/index.php?r=16156361" target="_blank">اذهب</a>
       </div>
     </div>
     <div class="card">
       <div class="title">TimeBucks — مهام وسرعات</div>
       <div class="desc">مهام مختلفة: مشاهدة، تسجيل، أفكار سريعة.</div>
       <div class="meta">
-        <a class="btn open-btn" href="https://timebucks.com/?refID=227024124" target="_blank" rel="noopener noreferrer">اذهب</a>
-      </div>
-    </div>
-    <div class="card">
-      <div class="title">GemsLoot — عروض وكسب</div>
-      <div class="desc">عروض وربح عبر تحميل وتجربة — رابط إحالة.</div>
-      <div class="meta">
-        <a class="btn open-btn" href="https://gemsloot.com/?aff=" target="_blank" rel="noopener noreferrer">اذهب</a>
-      </div>
-    </div>
-    <div class="card">
-      <div class="title">Idle-Empire — مهام وألعاب</div>
-      <div class="desc">من أشهر مواقع المهام والاستبيانات.</div>
-      <div class="meta">
-        <a class="btn open-btn" href="https://www.idle-empire.com?r=fofsqy" target="_blank" rel="noopener noreferrer">اذهب</a>
+        <a class="btn open-btn" href="https://timebucks.com/?refID=227024124" target="_blank">اذهب</a>
       </div>
     </div>
   </div>
 </main>
 
+<div style="margin-top:30px;">
+  <h2 class="title">من نحن</h2>
+  <p style="color:var(--muted);">Game Task هو موقع يقدم الاستبيانات والمهمات لجميع الزوار، مع نظام نقاط متكامل لمكافأة المستخدمين على نشاطهم.</p>
+</div>
+
+<div style="margin-top:20px;">
+  <h2 class="title">اتصل بنا</h2>
+  <form id="contactForm">
+    <input type="text" placeholder="الاسم" required>
+    <input type="email" placeholder="البريد الإلكتروني" required>
+    <textarea placeholder="رسالتك" rows="4" required></textarea>
+    <button type="submit" class="send-btn">إرسال</button>
+  </form>
+</div>
+
+<footer>
+  ملاحظة: يمكنك إضافة كود Google AdSense في الأماكن المخصصة للإعلانات.
+</footer>
+
 <script>
-const surveys = [];
-for(let i=1;i<=20;i++){
-  surveys.push({title:'استبيان '+i, desc:'أجب على الاستبيان لتحصل على نقاط.'});
-}
-const tasks = [];
-const topics=['ثقافي','ديني','رياضي','عام'];
-for(let i=1;i<=20;i++){
-  const topic=topics[i%topics.length];
-  tasks.push({title:'مهمة '+i+' ('+topic+')', desc:'أكمل هذه المهمة واحصل على نقاط.'});
-}
+// البيانات الأساسية
+let points = 0;
+const goldCard = document.getElementById('goldCard');
+const goldModal = document.getElementById('goldModal');
+const surveysSection = document.getElementById('surveysSection');
+const tasksSection = document.getElementById('tasksSection');
 
-const surveysSection=document.getElementById('surveysSection');
-surveys.forEach((s)=>{
-  const card=document.createElement('div');
-  card.className='card';
-  card.innerHTML=`<div class="title">${s.title}</div><div class="desc">${s.desc}</div><div class="meta"><button class="btn open-btn" onclick="addPoint()">أكمل</button></div>`;
-  surveysSection.appendChild(card);
-});
-
-const tasksSection=document.getElementById('tasksSection');
-tasks.forEach((t)=>{
-  const card=document.createElement('div');
-  card.className='card';
-  card.innerHTML=`<div class="title">${t.title}</div><div class="desc">${t.desc}</div><div class="meta"><button class="btn open-btn" onclick="addPoint()">أكمل</button></div>`;
-  tasksSection.appendChild(card);
-});
-
-let points=0;
-function addPoint(){points++;document.getElementById('pointsCounter').textContent='النقاط: '+points;}
-
-const goldCard=document.getElementById('goldCard');
-const goldModal=document.getElementById('goldModal');
-
-goldCard.addEventListener('click',()=>{
+// فتح القالب الذهبي
+goldCard.addEventListener('click', ()=>{
   goldModal.style.display='flex';
 });
 
+// إغلاق القالب
 function closeModal(){
   goldModal.style.display='none';
   surveysSection.style.display='none';
   tasksSection.style.display='none';
 }
 
+// إظهار القسم المحدد
 function showSection(sectionId){
-  surveysSection.style.display=sectionId==='surveysSection'?'grid':'none';
-  tasksSection.style.display=sectionId==='tasksSection'?'grid':'none';
+  surveysSection.style.display = sectionId==='surveysSection'?'grid':'none';
+  tasksSection.style.display = sectionId==='tasksSection'?'grid':'none';
 }
-</script>
 
-</body>
-      </html>
+// تسجيل النقاط
+function addPoint(){
+  points++;
+  document.getElementById('pointsCounter').textContent='النقاط: '+points;
+}
+
+// مثال أسئلة جاهزة
+const sampleSurvey = {
+  title:'استبيان 1',
+  questions:[
+    {q:'ما هو عاصمة فرنسا؟', options:['باريس','روما','مدريد'], answer:0},
+    {q:'ما هو أصغر كوكب؟', options:['الأرض','عطارد','المشتري'], answer:1},
+  ]
+};
+
+const sampleTask = {
+  title:'مهمة ثقافية 1',
+  questions:[
+    {q:'كم عدد القارات؟', options:['5','6','7'], answer:2},
+    {q:'ما هو أطول نهر؟', options:['النيل','الأمازون','اليانغتسي'], answer:0},
+  ]
+};
+
+// إضافة مثال استبيان
+const surveyCard = document.createElement('div');
+surveyCard.className='card';
+surveyCard.innerHTML=`<div class="title">${sampleSurvey.title}</div>
+<div class="meta"><button class="btn open-btn" onclick="showQuestions('survey',0)">ابدأ</button></div>`;
+surveysSection.appendChild(surveyCard);
+
+// إضافة مثال مهمة
+const taskCard = document.createElement('div');
+taskCard.className='card';
+taskCard.innerHTML=`<div class="title">${sampleTask.title}</div>
+<div class="meta"><button class="btn open-btn" onclick="showQuestions('task',0)">ابدأ</button></div>`;
+tasksSection.appendChild(taskCard);
+
+// عرض الأسئلة داخل القالب
+function showQuestions(type,index){
+  let container = document.createElement('div');
+  container.className='subgrid';
+  let data = type==='survey'?sampleSurvey:sampleTask;
+  data.questions.forEach((q,i)=>{
+    let card = document.createElement('div');
+    card.className='question-card';
+    card.innerHTML=`<div
