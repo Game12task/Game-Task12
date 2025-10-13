@@ -1,53 +1,92 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Game Task — عروض الاستبيانات</title>
-  <style>
-    :root{
-      --bg:#0b1220; --card:#071227; --accent:#06b6d4; --muted:#94a3b8; --gold:#d4af37;
-    }
-    *{box-sizing:border-box;font-family:"Segoe UI",Tahoma,"Noto Kufi Arabic",system-ui,sans-serif;}
-    body{margin:0;background:linear-gradient(180deg,#071127 0%, #071a2a 100%);color:#e6eef6;padding:20px;}
-    header{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px;}
-    .brand{display:flex;align-items:center;gap:12px;}
-    .logo{width:54px;height:54px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#0891b2);display:flex;align-items:center;justify-content:center;font-weight:700;}
-    h1{margin:0;font-size:20px;}
-    p.lead{margin:0;color:var(--muted);font-size:13px;}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:18px;}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column;gap:10px;min-height:160px;transition:transform 0.2s,box-shadow 0.2s;}
-    .card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,0.4);}
-    .title{font-weight:700;font-size:16px;}
-    .desc{color:var(--muted);font-size:13px;}
-    .meta{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:auto;}
-    .btn{padding:10px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700;}
-    .open-btn{background:linear-gradient(90deg,var(--accent),#0891b2);color:#022;text-decoration:none;display:inline-block;text-align:center;width:100%;}
-    
-    /* البطاقة الذهبية الفخمة */
-    .gold-card{
-      background: linear-gradient(135deg, rgba(212,175,55,0.3), rgba(212,175,55,0.1));
-      border: 2px solid rgba(212,175,55,0.8);
-      border-radius:16px;
-      box-shadow: 0 10px 25px rgba(212,175,55,0.4);
-      transition: transform 0.3s, box-shadow 0.3s;
-      cursor: pointer;
-    }
-    .gold-card:hover{
-      transform: translateY(-5px) scale(1.02);
-      box-shadow:0 12px 30px rgba(212,175,55,0.6);
-    }
-    .gold-card .title{color:var(--gold); font-size:18px; text-align:center;}
-    .gold-card .counter{font-size:14px;color:var(--gold);font-weight:700;margin-bottom:10px;text-align:center;}
-    .option-menu{display:none; flex-direction: column; gap:8px; margin-top:10px;}
-    .option-menu button{background:var(--gold); color:#022; font-weight:700; border-radius:8px; padding:8px;}
-    
-    footer{margin-top:22px;color:var(--muted);font-size:13px;text-align:center;}
-    .section-title{font-size:18px;font-weight:700;margin-bottom:10px;color:var(--accent);}
-    .subgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
-    input, textarea{width:100%;padding:8px;border-radius:6px;border:none;margin-bottom:10px;}
-    button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8px;border:0;cursor:pointer;font-weight:700;width:100%;}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Game Task — عروض الاستبيانات</title>
+<style>
+:root{
+  --bg:#0b1220; --card:#071227; --accent:#06b6d4; --muted:#94a3b8; --gold:#d4af37;
+}
+*{box-sizing:border-box;font-family:"Segoe UI",Tahoma,"Noto Kufi Arabic",system-ui,sans-serif;}
+body{margin:0;background:linear-gradient(180deg,#071127 0%, #071a2a 100%);color:#e6eef6;padding:20px;}
+header{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px;}
+.brand{display:flex;align-items:center;gap:12px;}
+.logo{width:54px;height:54px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#0891b2);display:flex;align-items:center;justify-content:center;font-weight:700;}
+h1{margin:0;font-size:20px;}
+p.lead{margin:0;color:var(--muted);font-size:13px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:18px;}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column;gap:10px;min-height:160px;transition:transform 0.2s,box-shadow 0.2s;}
+.card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,0.4);}
+.title{font-weight:700;font-size:16px;}
+.desc{color:var(--muted);font-size:13px;}
+.meta{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:auto;}
+.btn{padding:10px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700;}
+.open-btn{background:linear-gradient(90deg,var(--accent),#0891b2);color:#022;text-decoration:none;display:inline-block;text-align:center;width:100%;}
+
+/* البطاقة الذهبية */
+.gold-card{
+  background: linear-gradient(135deg, rgba(212,175,55,0.3), rgba(212,175,55,0.1));
+  border: 2px solid rgba(212,175,55,0.8);
+  border-radius:16px;
+  box-shadow: 0 10px 25px rgba(212,175,55,0.4);
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+.gold-card:hover{
+  transform: translateY(-5px) scale(1.02);
+  box-shadow:0 12px 30px rgba(212,175,55,0.6);
+}
+.gold-card .title{color:var(--gold); font-size:18px; text-align:center;}
+.gold-card .counter{font-size:14px;color:var(--gold);font-weight:700;margin-bottom:10px;text-align:center;}
+
+/* القالب المستقل (Modal) */
+#goldModal{
+  display:none; 
+  position:fixed;
+  top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,0.75);
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+.modal-content{
+  background:var(--card);
+  padding:20px;
+  border-radius:12px;
+  max-width:600px;
+  width:90%;
+  max-height:80%;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.modal-content .title{font-size:20px;text-align:center;color:var(--gold);}
+.modal-content .modal-buttons{display:flex;gap:10px;justify-content:center;}
+.modal-content .modal-buttons button{
+  flex:1;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  background:var(--accent);
+  color:#022;
+  cursor:pointer;
+  font-weight:700;
+}
+.close-btn{
+  align-self:flex-end;
+  background:#d4af37;
+  color:#022;
+  border:none;
+  padding:5px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:12px;
+}
+
+.subgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:10px;}
+</style>
 </head>
 <body>
 
@@ -61,22 +100,24 @@
   </div>
 </header>
 
-<!-- البطاقة الذهبية الفخمة -->
+<!-- البطاقة الذهبية -->
 <div class="gold-card" id="goldCard">
   <div class="title">عروض مميزة</div>
   <div class="counter" id="pointsCounter">النقاط: 0</div>
-  
-  <!-- قائمة الخيارات -->
-  <div class="option-menu" id="goldOptions">
-    <button onclick="showSection('surveysGrid')">استبيانات</button>
-    <button onclick="showSection('tasksGrid')">مهام</button>
+</div>
+
+<!-- القالب المستقل -->
+<div id="goldModal">
+  <div class="modal-content">
+    <button class="close-btn" onclick="closeModal()">×</button>
+    <div class="title">عروض مميزة</div>
+    <div class="modal-buttons">
+      <button onclick="showSection('surveysSection')">استبيانات</button>
+      <button onclick="showSection('tasksSection')">مهام</button>
+    </div>
+    <div id="surveysSection" class="subgrid" style="display:none;"></div>
+    <div id="tasksSection" class="subgrid" style="display:none;"></div>
   </div>
-  
-  <!-- فرع الاستبيانات -->
-  <div class="subgrid" id="surveysGrid" style="display:none;"></div>
-  
-  <!-- فرع المهمات -->
-  <div class="subgrid" id="tasksGrid" style="display:none;"></div>
 </div>
 
 <div style="margin-bottom:20px; text-align:center;">
@@ -124,73 +165,55 @@
   </div>
 </main>
 
-<div style="margin-top:30px;">
-  <h2 class="section-title">من نحن</h2>
-  <p style="color:var(--muted);">Game Task هو موقع يقدم الاستبيانات والمهمات لجميع الزوار، مع نظام نقاط متكامل لمكافأة المستخدمين على نشاطهم. هدفنا هو تقديم محتوى متنوع وممتع يجمع بين التعلم والترفيه.</p>
-</div>
-
-<div style="margin-top:20px;">
-  <h2 class="section-title">اتصل بنا</h2>
-  <form id="contactForm">
-    <input type="text" placeholder="الاسم" required>
-    <input type="email" placeholder="البريد الإلكتروني" required>
-    <textarea placeholder="رسالتك" rows="4" required></textarea>
-    <button type="submit" class="send-btn">إرسال</button>
-  </form>
-</div>
-
-<footer>
-  ملاحظة: يمكنك إضافة كود Google AdSense في الأماكن المخصصة للإعلانات.
-</footer>
-
 <script>
-  const surveys = [];
-  for(let i=1;i<=20;i++){
-    surveys.push({title:'استبيان '+i, desc:'أجب على الاستبيان لتحصل على نقاط.'});
-  }
-  const tasks = [];
-  const topics = ['ثقافي','ديني','رياضي','عام'];
-  for(let i=1;i<=20;i++){
-    const topic = topics[i%topics.length];
-    tasks.push({title:'مهمة '+i+' ('+topic+')', desc:'أكمل هذه المهمة واحصل على نقاط.'});
-  }
+const surveys = [];
+for(let i=1;i<=20;i++){
+  surveys.push({title:'استبيان '+i, desc:'أجب على الاستبيان لتحصل على نقاط.'});
+}
+const tasks = [];
+const topics=['ثقافي','ديني','رياضي','عام'];
+for(let i=1;i<=20;i++){
+  const topic=topics[i%topics.length];
+  tasks.push({title:'مهمة '+i+' ('+topic+')', desc:'أكمل هذه المهمة واحصل على نقاط.'});
+}
 
-  const surveysGrid = document.getElementById('surveysGrid');
-  surveys.forEach((s)=>{
-    const card = document.createElement('div');
-    card.className='card';
-    card.innerHTML=`<div class="title">${s.title}</div><div class="desc">${s.desc}</div><div class="meta"><button class="btn open-btn" onclick="addPoint()">أكمل</button></div>`;
-    surveysGrid.appendChild(card);
-  });
+const surveysSection=document.getElementById('surveysSection');
+surveys.forEach((s)=>{
+  const card=document.createElement('div');
+  card.className='card';
+  card.innerHTML=`<div class="title">${s.title}</div><div class="desc">${s.desc}</div><div class="meta"><button class="btn open-btn" onclick="addPoint()">أكمل</button></div>`;
+  surveysSection.appendChild(card);
+});
 
-  const tasksGrid = document.getElementById('tasksGrid');
-  tasks.forEach((t)=>{
-    const card = document.createElement('div');
-    card.className='card';
-    card.innerHTML=`<div class="title">${t.title}</div><div class="desc">${t.desc}</div><div class="meta"><button class="btn open-btn" onclick="addPoint()">أكمل</button></div>`;
-    tasksGrid.appendChild(card);
-  });
+const tasksSection=document.getElementById('tasksSection');
+tasks.forEach((t)=>{
+  const card=document.createElement('div');
+  card.className='card';
+  card.innerHTML=`<div class="title">${t.title}</div><div class="desc">${t.desc}</div><div class="meta"><button class="btn open-btn" onclick="addPoint()">أكمل</button></div>`;
+  tasksSection.appendChild(card);
+});
 
-  let points=0;
-  function addPoint(){points++;document.getElementById('pointsCounter').textContent='النقاط: '+points;}
+let points=0;
+function addPoint(){points++;document.getElementById('pointsCounter').textContent='النقاط: '+points;}
 
-  document.getElementById('contactForm').addEventListener('submit', function(e){
-    e.preventDefault();
-    alert('تم إرسال رسالتك بنجاح!');
-    this.reset();
-  });
+const goldCard=document.getElementById('goldCard');
+const goldModal=document.getElementById('goldModal');
 
-  // التحكم بعرض خيارات البطاقة الذهبية
-  const goldCard = document.getElementById('goldCard');
-  const goldOptions = document.getElementById('goldOptions');
-  function showSection(sectionId){
-    document.getElementById('surveysGrid').style.display = sectionId==='surveysGrid'?'grid':'none';
-    document.getElementById('tasksGrid').style.display = sectionId==='tasksGrid'?'grid':'none';
-  }
-  goldCard.addEventListener('click', ()=>{
-    goldOptions.style.display = goldOptions.style.display==='flex'?'none':'flex';
-  });
+goldCard.addEventListener('click',()=>{
+  goldModal.style.display='flex';
+});
+
+function closeModal(){
+  goldModal.style.display='none';
+  surveysSection.style.display='none';
+  tasksSection.style.display='none';
+}
+
+function showSection(sectionId){
+  surveysSection.style.display=sectionId==='surveysSection'?'grid':'none';
+  tasksSection.style.display=sectionId==='tasksSection'?'grid':'none';
+}
 </script>
 
 </body>
-</html>
+      </html>
