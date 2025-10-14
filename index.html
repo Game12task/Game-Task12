@@ -29,6 +29,16 @@ p.lead{margin:0;color:var(--muted);font-size:13px;}
 footer{margin-top:22px;color:var(--muted);font-size:13px;text-align:center;}
 .section-title{font-size:18px;font-weight:700;margin-bottom:10px;color:var(--accent);}
 .subgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
+/* تصميم خاص للعروض الخارجية في النافذة المنبثقة */
+.external-offer {
+    text-decoration: none;
+    display: block;
+}
+.external-offer .card {
+    cursor: pointer;
+    background: linear-gradient(180deg, rgba(6,182,212,0.1), rgba(6,182,212,0.05));
+    border-color: rgba(6,182,212,0.3);
+}
 input, textarea{width:100%;padding:8px;border-radius:6px;border:none;margin-bottom:10px;}
 button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8px;border:0;cursor:pointer;font-weight:700;width:100%;}
 /* نافذة منبثقة */
@@ -49,24 +59,21 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
   </div>
 </header>
 
-<!-- القالب الذهبي -->
 <div class="card gold-card" id="goldCard">
   <div class="title">عروض مميزة</div>
   <div class="counter" id="pointsCounter">النقاط: 0</div>
 </div>
 
-<!-- النافذة المنبثقة -->
 <div id="goldModal">
   <div id="goldContent">
     <button id="closeModal">×</button>
-    <h2 style="color:#d4af37;">استبيانات</h2>
+    <h2 style="color:#d4af37;">الاستبيانات</h2>
     <div id="surveysGrid" class="subgrid"></div>
     <h2 style="color:#d4af37; margin-top:20px;">المهام</h2>
     <div id="tasksGrid" class="subgrid"></div>
   </div>
 </div>
 
-<!-- مكان لإعلانات Google -->
 <div style="margin-bottom:20px; text-align:center;">
   <p style="color:var(--muted);">إعلان Google</p>
 </div>
@@ -111,13 +118,11 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
   </div>
 </main>
 
-<!-- قسم من نحن -->
 <div style="margin-top:30px;">
   <h2 class="section-title">من نحن</h2>
   <p style="color:var(--muted);">Game Task هو موقع يقدم الاستبيانات والمهمات لجميع الزوار، مع نظام نقاط متكامل لمكافأة المستخدمين على نشاطهم. هدفنا هو تقديم محتوى متنوع وممتع يجمع بين التعلم والترفيه.</p>
 </div>
 
-<!-- نموذج الاتصال -->
 <div style="margin-top:20px;">
   <h2 class="section-title">اتصل بنا</h2>
   <form id="contactForm">
@@ -133,27 +138,16 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
 </footer>
 
 <script>
-  // بيانات الاستبيانات الجاهزة
-  const surveys = [];
-  for(let i=1;i<=10;i++){
-    surveys.push({
-      title:'استبيان '+i+' (10 أسئلة)',
-      questions:[
-        {q:'سؤال 1؟',options:['أ','ب','ج'],answer:'أ'},
-        {q:'سؤال 2؟',options:['أ','ب','ج'],answer:'ب'},
-        {q:'سؤال 3؟',options:['أ','ب','ج'],answer:'ج'},
-        {q:'سؤال 4؟',options:['أ','ب','ج'],answer:'أ'},
-        {q:'سؤال 5؟',options:['أ','ب','ج'],answer:'ب'},
-        {q:'سؤال 6؟',options:['أ','ب','ج'],answer:'ج'},
-        {q:'سؤال 7؟',options:['أ','ب','ج'],answer:'أ'},
-        {q:'سؤال 8؟',options:['أ','ب','ج'],answer:'ب'},
-        {q:'سؤال 9؟',options:['أ','ب','ج'],answer:'ج'},
-        {q:'سؤال 10؟',options:['أ','ب','ج'],answer:'أ'}
-      ]
-    });
-  }
-
-  // بيانات المهام الجاهزة
+  // بيانات الاستبيانات الجديدة (تم إضافة رابطك كاستبيان خارجي)
+  const surveys = [
+    {
+      title: 'استبيان تقييم خارجي (مميز)',
+      url: 'https://forms.gle/DVGHwSGcMLTf3jck8',
+      desc: 'اضغط للمشاركة في استبيان Google Forms (سيفتح في نافذة جديدة)'
+    }
+  ];
+  
+  // تم إبقاء بيانات المهام الجاهزة كما كانت
   const tasks = [];
   for(let i=1;i<=10;i++){
     tasks.push({
@@ -173,25 +167,30 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
   const tasksGrid = document.getElementById('tasksGrid');
   let points = 0;
 
-  // عرض الاستبيانات
+  // دالة عرض الاستبيانات (تم تعديلها لعرض الروابط الخارجية)
   function renderSurveys(){
     surveysGrid.innerHTML='';
-    surveys.forEach((s,i)=>{
-      const card=document.createElement('div');
-      card.className='card';
-      let html=`<div class="title">${s.title}</div>`;
-      s.questions.forEach((q,j)=>{
-        html+=`<div class="desc">${q.q}</div>`;
-        q.options.forEach(o=>{
-          html+=`<button class="btn" onclick="checkAnswer('${o}','${q.answer}')">${o}</button>`;
-        });
-      });
-      card.innerHTML=html;
-      surveysGrid.appendChild(card);
+    
+    // عرض الاستبيان الخارجي (رابطك)
+    surveys.forEach((s)=>{
+      const link = document.createElement('a');
+      link.href = s.url;
+      link.target = "_blank"; // يفتح الرابط في نافذة جديدة
+      link.className = 'external-offer';
+      
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `<div class="title">${s.title}</div><div class="desc">${s.desc}</div>`;
+      
+      link.appendChild(card);
+      surveysGrid.appendChild(link);
     });
+
+    // يمكنك إضافة الأكواد الخاصة بعرض الاستبيانات الداخلية هنا إذا أردت
+    // لكنها لم تعد موجودة في مصفوفة 'surveys' بعد التعديل.
   }
 
-  // عرض المهام
+  // دالة عرض المهام (لم تتغير)
   function renderTasks(){
     tasksGrid.innerHTML='';
     tasks.forEach((t,i)=>{
@@ -209,18 +208,21 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
     });
   }
 
+  // دالة فحص الإجابة (لم تتغير)
   function checkAnswer(selected,correct){
     if(selected===correct){points++;document.getElementById('pointsCounter').textContent='النقاط: '+points;}
     alert('تم اختيار '+selected+'. الإجابة الصحيحة: '+correct);
   }
 
+  // كود فتح وإغلاق النافذة المنبثقة (لم يتغير)
   goldCard.onclick=function(){
     goldModal.style.display='block';
-    renderSurveys();
+    renderSurveys(); // سيتم استدعاء الدالة الجديدة لعرض الرابط الخارجي
     renderTasks();
   };
   closeModal.onclick=function(){goldModal.style.display='none';};
 
+  // كود نموذج الاتصال (لم يتغير)
   document.getElementById('contactForm').addEventListener('submit',function(e){
     e.preventDefault();alert('تم إرسال رسالتك بنجاح!');this.reset();
   });
