@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Game Task — عروض الاستبيانات</title>
 <style>
-/* ... التنسيقات (Styles) تبقى كما هي ... */
+/* -------------------------------------- */
+/* الأنماط الأساسية (CSS) */
+/* -------------------------------------- */
 :root{
   --bg:#0b1220; --card:#071227; --accent:#06b6d4; --muted:#94a3b8; --gold:#d4af37;
 }
@@ -30,12 +32,10 @@ p.lead{margin:0;color:var(--muted);font-size:13px;}
 footer{margin-top:22px;color:var(--muted);font-size:13px;text-align:center;}
 .section-title{font-size:18px;font-weight:700;margin-bottom:10px;color:var(--accent);}
 .subgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
-/* تنسيق خاص للزرار الخارجية (تم الإكمال) */
 .external-complete-btn {
     background-color: #4CAF50 !important; 
     color: #022 !important;
 }
-/* إخفاء محتوى الاستبيان حتى يتم اختياره */
 .survey-content {
     display: none;
     padding: 10px;
@@ -52,6 +52,21 @@ footer{margin-top:22px;color:var(--muted);font-size:13px;text-align:center;}
     color: var(--gold);
     font-weight: 700;
     margin-bottom: 10px;
+}
+/* تنسيق خاص لبطاقة التضمين (لجعلها أكبر) */
+.embed-card {
+    /* تجعل البطاقة تأخذ مساحة أكبر في عرض subgrid */
+    grid-column: span 2; 
+    min-height: 450px !important;
+    padding: 0; 
+    overflow: hidden;
+    cursor: default; /* تعطيل مؤشر النقر */
+}
+.embed-card iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 12px;
 }
 
 input, textarea{width:100%;padding:8px;border-radius:6px;border:none;margin-bottom:10px;}
@@ -161,11 +176,10 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
   let currentSurveyIndex = 0;
   let currentQuestionIndex = 0;
   let points = 0;
-  let surveyCompleted = false;
 
   // بيانات الاستبيانات
   const surveys = [
-    // الاستبيان الداخلي الأول (10 أسئلة)
+    // الاستبيان الداخلي (يظهر سؤال واحد تلو الآخر)
     {
       title: 'استبيان داخلي (10 أسئلة)',
       questions: [
@@ -183,18 +197,18 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
       type: 'internal',
       pointsPerQuestion: 1,
     },
-    // الاستبيان الخارجي (رابطك)
+    // الاستبيان الخارجي (المدمج - رابطك)
     {
-      title: 'استبيان تقييم خارجي (مميز)',
-      url: 'https://forms.gle/DVGHwSGcMLTf3jck8',
-      desc: 'أكمل الاستبيان بالضغط على "اذهب" ثم عد واضغط على "تم الإكمال" للحصول على 5 نقاط.',
-      type: 'external',
+      title: 'استبيان تقييم خارجي (مدمج)',
+      // تم وضع رابط التضمين الصحيح لاستبيانك
+      embedUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSeCipNvVoBhIYFkrRFgKdm5fwi-ZF_xadGovqp10ap4Uu3YCg/viewform?embedded=true', 
+      desc: 'أكمل النموذج أدناه مباشرة. النقاط ستضاف يدوياً أو بعد إكمال النموذج.',
+      type: 'embedded',
       points: 5,
-      completed: false
     }
   ];
 
-  // بيانات المهام الجاهزة (تبقى تعرض كل شيء دفعة واحدة)
+  // بيانات المهام الجاهزة (تظهر كل الأسئلة معاً)
   const tasks = [];
   for (let i = 1; i <= 3; i++) {
     tasks.push({
@@ -213,63 +227,52 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
   const surveysGrid = document.getElementById('surveysGrid');
   const singleSurveyView = document.getElementById('singleSurveyView');
 
-  // ----------------------------------------------------
   // دالة عرض قائمة الاستبيانات
-  // ----------------------------------------------------
   function renderSurveysList() {
-    surveysGrid.style.display = 'grid'; // إظهار القائمة
-    singleSurveyView.style.display = 'none'; // إخفاء عرض سؤال واحد
+    surveysGrid.style.display = 'grid'; 
+    singleSurveyView.style.display = 'none'; 
 
     surveysGrid.innerHTML = '';
     surveys.forEach((s, i) => {
       const card = document.createElement('div');
-      card.className = 'card survey-card';
       
       if (s.type === 'internal') {
+        card.className = 'card survey-card';
         card.innerHTML = `<div class="title">${s.title}</div><div class="desc">${s.questions.length} أسئلة - ${s.pointsPerQuestion * s.questions.length} نقاط.</div>`;
-        card.onclick = () => startSurvey(i); // تبدأ الاستبيان الداخلي
-      } else if (s.type === 'external') {
-        // الاستبيان الخارجي
-        const isCompleted = s.completed;
-        card.style.opacity = isCompleted ? 0.6 : 1;
+        card.onclick = () => startSurvey(i);
+      
+      } else if (s.type === 'embedded') {
+        // بطاقة التضمين (الاستبيان الخارجي المدمج)
+        card.className = 'card embed-card';
         card.innerHTML = `
-          <div class="title">${s.title}</div>
-          <div class="desc" style="margin-bottom: 10px;">${s.desc}</div>
-          <div class="meta" style="flex-direction: column; align-items: stretch; gap: 8px;">
-            <a class="btn open-btn" href="${s.url}" target="_blank" rel="noopener noreferrer">اذهب للاستبيان</a>
-            <button class="btn ${isCompleted ? 'external-complete-btn' : ''}" style="pointer-events: ${isCompleted ? 'none' : 'auto'};" onclick="completeExternalSurvey(${i}, this)">
-                ${isCompleted ? 'تم الإكمال بنجاح' : `تم الإكمال (+${s.points} نقاط)`}
-            </button>
+          <div style="padding: 14px; background: rgba(0,0,0,0.1); border-radius: 12px 12px 0 0;">
+            <div class="title" style="color: var(--gold); margin-bottom: 5px;">${s.title} (${s.points} نقاط)</div>
+            <div class="desc">${s.desc}</div>
           </div>
+          <iframe src="${s.embedUrl}" style="height: calc(100% - 70px);"></iframe>
         `;
-        card.onclick = null; // تعطيل النقر على البطاقة بالكامل
+        card.onclick = null; 
       }
       surveysGrid.appendChild(card);
     });
   }
 
-  // ----------------------------------------------------
   // دالة بدء الاستبيان الداخلي
-  // ----------------------------------------------------
   function startSurvey(index) {
     currentSurveyIndex = index;
     currentQuestionIndex = 0;
-    surveyCompleted = false;
-    surveysGrid.style.display = 'none'; // إخفاء القائمة
-    singleSurveyView.style.display = 'block'; // إظهار عرض السؤال
+    surveysGrid.style.display = 'none'; 
+    singleSurveyView.style.display = 'block'; 
     renderSingleQuestion();
   }
 
-  // ----------------------------------------------------
   // دالة عرض سؤال واحد فقط
-  // ----------------------------------------------------
   function renderSingleQuestion() {
     const survey = surveys[currentSurveyIndex];
     const totalQuestions = survey.questions.length;
     const currentQ = survey.questions[currentQuestionIndex];
 
     if (currentQuestionIndex < totalQuestions) {
-      // لا يزال هناك أسئلة
       let html = `
         <button class="btn" onclick="renderSurveysList()" style="width: auto; margin-bottom: 15px;">🔙 العودة لقائمة الاستبيانات</button>
         <div class="survey-progress">السؤال ${currentQuestionIndex + 1} من ${totalQuestions}</div>
@@ -282,22 +285,18 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
       html += `</div>`;
       singleSurveyView.innerHTML = html;
     } else {
-      // تم الانتهاء من جميع الأسئلة
+      // تم الانتهاء
       singleSurveyView.innerHTML = `
         <h3 style="color: var(--gold); margin-top: 50px;">🎉 تهانينا! لقد أكملت الاستبيان بنجاح.</h3>
         <p>تم احتساب النقاط المكتسبة.</p>
         <button class="btn external-complete-btn" onclick="renderSurveysList()" style="width: auto; margin-top: 20px;">العودة لقائمة الاستبيانات</button>
       `;
-      surveyCompleted = true; // يمكن استخدامها لمنع تكرار اللعب
     }
   }
 
-  // ----------------------------------------------------
   // دالة فحص الإجابة والانتقال للسؤال التالي
-  // ----------------------------------------------------
   function checkAnswer(selected, correct, buttonElement) {
     const survey = surveys[currentSurveyIndex];
-    // تعطيل جميع الأزرار بعد اختيار الإجابة
     document.querySelectorAll('#optionsContainer .btn').forEach(btn => btn.disabled = true);
 
     if (selected === correct) {
@@ -310,34 +309,13 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
       alert('إجابة خاطئة. الإجابة الصحيحة كانت: ' + correct);
     }
     
-    // الانتقال إلى السؤال التالي بعد تأخير بسيط (1 ثانية)
     setTimeout(() => {
       currentQuestionIndex++;
       renderSingleQuestion();
     }, 1000); 
   }
 
-  // ----------------------------------------------------
-  // دالة إكمال الاستبيان الخارجي
-  // ----------------------------------------------------
-  function completeExternalSurvey(index, buttonElement){
-      const externalSurvey = surveys[index];
-      if (externalSurvey.completed) return;
-
-      points += externalSurvey.points;
-      document.getElementById('pointsCounter').textContent = 'النقاط: ' + points;
-      
-      externalSurvey.completed = true;
-      buttonElement.disabled = true; // تعطيل الزر لمنع تكرار النقاط
-      buttonElement.textContent = `تم إضافة ${externalSurvey.points} نقاط!`;
-      buttonElement.classList.add('external-complete-btn');
-      
-      alert(`تهانينا! تم إضافة ${externalSurvey.points} نقاط بنجاح لإكمال الاستبيان الخارجي.`);
-  }
-
-  // ----------------------------------------------------
-  // دالة عرض المهام (لم تتغير)
-  // ----------------------------------------------------
+  // دالة عرض المهام (التي تظهر كل شيء معاً)
   function renderTasks(){
     const tasksGrid = document.getElementById('tasksGrid');
     tasksGrid.innerHTML='';
@@ -348,7 +326,6 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
       t.questions.forEach((q,j)=>{
         html+=`<div class="desc">${q.q}</div>`;
         q.options.forEach(o=>{
-          // لاحظ: تم استبدال checkAnswer بسيطة لأن المهام ليست جزءاً من نظام النقاط الجديد
           html+=`<button class="btn" style="width: auto; margin: 2px;" onclick="alert('اخترت: ${o}')">${o}</button>`;
         });
       });
@@ -357,12 +334,10 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
     });
   }
 
-  // ----------------------------------------------------
   // وظائف فتح وإغلاق النافذة المنبثقة
-  // ----------------------------------------------------
   goldCard.onclick = function() {
     goldModal.style.display = 'block';
-    renderSurveysList(); // يبدأ بعرض قائمة الاستبيانات
+    renderSurveysList(); 
     renderTasks();
   };
   closeModal.onclick = function() {
