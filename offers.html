@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختر تحدي الاستبيان</title>
+    <style>
+        /* الأنماط مطابقة لملفك index.html لضمان التناسق */
+        :root{--bg:#0b1220; --card:#071227; --accent:#06b6d4; --muted:#94a3b8; --gold:#d4af37;}
+        body{margin:0;background:linear-gradient(180deg,#071127 0%, #071a2a 100%);color:#e6eef6;padding:20px;font-family:"Segoe UI",Tahoma,"Noto Kufi Arabic",system-ui,sans-serif; direction: rtl; text-align: center;}
+        .container { max-width: 600px; margin: 50px auto; background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        h1 { color: var(--gold); margin-bottom: 30px; font-size: 28px; }
+        .challenge-card {
+            display: block;
+            background: #1a2332;
+            padding: 20px;
+            margin: 15px auto;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #e6eef6;
+            transition: background 0.3s, transform 0.2s;
+            text-align: right;
+            border-right: 5px solid;
+        }
+        .challenge-card:hover { transform: translateY(-3px); background: #2a374a; }
+        
+        /* ألوان حدود البطاقات لتمييز التحديات */
+        .c5 { border-color: var(--accent); } 
+        .c7 { border-color: #f39c12; }
+        .c10 { border-color: #e74c3c; }
+
+        .challenge-card h2 { margin: 0; font-size: 22px; }
+        .challenge-card p { margin: 5px 0 0; color: var(--muted); }
+        .points { font-size: 16px; font-weight: bold; color: var(--gold); margin-top: 10px; }
+        
+        .back-link { display: inline-block; margin-top: 30px; color: var(--muted); text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>اختر التحدي الذهبي</h1>
+        
+        <a href="start_5q.html" class="challenge-card c5">
+            <h2>🥇 تحدي 5 أسئلة (الربح السريع)</h2>
+            <p>أجب على 5 أسئلة قصيرة. إجمالي 50 نقطة.</p>
+            <div class="points">5 إعلانات فاصلة</div>
+        </a>
+        
+        <a href="start_7q.html" class="challenge-card c7">
+            <h2>🥈 تحدي 7 أسئلة (الربح المتوسط)</h2>
+            <p>مجموعة أسئلة ثقافية. إجمالي 80 نقطة.</p>
+            <div class="points">7 إعلانات فاصلة</div>
+        </a>
+        
+        <a href="start_10q.html" class="challenge-card c10">
+            <h2>🥉 تحدي 10 أسئلة (الربح الأكبر)</h2>
+            <p>أجب على 10 أسئلة دينية وثقافية. إجمالي 120 نقطة.</p>
+            <div class="points">10 إعلانات فاصلة</div>
+        </a>
+
+        <a href="index.html" class="back-link">🔙 العودة للصفحة الرئيسية</a>
+    </div>
+</body>
+</html>
