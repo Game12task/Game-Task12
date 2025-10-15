@@ -10,7 +10,7 @@
 
 <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyDuQsN4n3In6arYu0wkw9gC...", // المفتاح الخاص بك (تأكد من أنه نفس الذي نسخته)
+      apiKey: "AIzaSyDuQsN4n3In6arYu0wkw9gC...", // المفتاح الخاص بك
       authDomain: "mytasktracker-59e00.firebaseapp.com",
       projectId: "mytasktracker-59e00",
       storageBucket: "mytasktracker-59e00.appspot.com",
@@ -114,7 +114,7 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
 ">
     <h3 id="user-display" style="margin: 0;"></h3>
 </div>
-<header>
+<header style="display:none;">
   <div class="brand">
     <div class="logo">GT</div>
     <div>
@@ -125,7 +125,7 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
 </header>
 
 <a href="offers.html" style="text-decoration: none;">
-    <div class="card gold-card" id="goldCard">
+    <div class="card gold-card" id="goldCard" style="display:none;">
         <div class="title">عروض مميزة</div>
         <div class="counter" id="pointsCounter">النقاط: 0</div>
         <div class="meta" style="margin-top: 10px;">
@@ -137,7 +137,7 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
   <p style="color:var(--muted);">إعلان Google</p>
 </div>
 
-<main>
+<main style="display:none;">
   <div class="grid" id="cardsGrid">
     <div class="card">
       <div class="title">Freecash — استبيانات ومهام</div>
@@ -251,20 +251,21 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
         document.getElementById('auth-section').style.display = 'none';
         // إظهار شريط عرض الآيدي
         document.getElementById('dashboard-section').style.display = 'block';
+        
+        // إظهار محتوى الموقع الأصلي بعد تسجيل الدخول (Header, Gold Card, Main)
+        document.querySelector('header').style.display = 'flex'; 
+        document.getElementById('goldCard').style.display = 'flex'; // إظهار القالب الذهبي
+        document.querySelector('main').style.display = 'block';
+        
         // تحديث بيانات المستخدم في الشريط
         const userDisplay = document.getElementById('user-display');
         userDisplay.innerHTML = `مرحباً يا ${username} | <b>آيدي المستخدم: ${userId}</b> | النقاط: ${points}`;
-        
-        // إظهار محتوى الموقع الأصلي بعد تسجيل الدخول (Header, Main, Footer)
-        document.querySelector('header').style.display = 'flex'; // تأكد من إظهاره
-        document.querySelector('main').style.display = 'block';
     }
     
     // الدخول التلقائي: التحقق من الآيدي المحفوظ عند تحميل الصفحة
     window.onload = function() {
-        // إخفاء محتوى الموقع الأصلي قبل التحقق
-        document.querySelector('header').style.display = 'none';
-        document.querySelector('main').style.display = 'none';
+        // إخفاء محتوى الموقع الأصلي قبل التحقق (لضمان ظهور نموذج الدخول فقط في البداية)
+        // Header و Main تم إخفاؤهما بالفعل عبر style="display:none" في HTML
         
         const storedUserId = localStorage.getItem('user_id');
         if (storedUserId) {
@@ -273,7 +274,7 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
                     const userData = doc.data();
                     displayDashboard(userData.username, storedUserId, userData.points);
                 } else {
-                    // إذا لم يوجد الآيدي في القاعدة (ربما تم حذفه)
+                    // إذا لم يوجد الآيدي في القاعدة (ربما تم حذفه)، اعرض نموذج الدخول
                     document.getElementById('auth-section').style.display = 'block';
                 }
             }).catch(error => {
