@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حل المهمة</title>
+    <script src="tasks_handler.js"></script>
+    <style>
+        /* الأنماط مطابقة لما سبق لضمان التناسق */
+        :root{--bg:#0b1220; --card:#071227; --accent:#06b6d4; --muted:#94a3b8; --gold:#d4af37; --success: #28a745; --error: #f44336;}
+        body{margin:0;background:linear-gradient(180deg,#071127 0%, #071a2a 100%);color:#e6eef6;padding:20px;font-family:"Segoe UI",Tahoma,"Noto Kufi Arabic",system-ui,sans-serif; direction: rtl; text-align: center;}
+        .container { max-width: 600px; margin: 30px auto; background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        h1 { color: var(--accent); margin-bottom: 20px; font-size: 24px; }
+        #question-text { font-size: 1.2em; margin-bottom: 25px; border-bottom: 2px solid var(--muted); padding-bottom: 15px; }
+        
+        .option-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 2px solid #1a2332;
+            background: #1a2332;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            text-align: right;
+        }
+        .option-button:hover { background: #2a374a; border-color: var(--accent); }
+        
+        /* حالات الإجابة */
+        .correct-answer { background-color: var(--success) !important; border-color: var(--success) !important; pointer-events: none; }
+        .wrong-answer { background-color: var(--error) !important; border-color: var(--error) !important; opacity: 0.7; pointer-events: none; }
+        
+        #result-message { 
+            margin-top: 20px; 
+            padding: 15px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            display: none; 
+            text-align: center;
+        }
+        .success { background-color: #d4edda; color: var(--success); }
+        .error { background-color: #f8d7da; color: var(--error); }
+        
+        #next-button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--accent);
+            color: var(--card);
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none; /* يظهر بعد الحل */
+        }
+        #next-button:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="task-title">جاري تحميل السؤال...</h1>
+        <p id="question-text">السؤال سيظهر هنا.</p>
+        
+        <div id="options-container">
+            </div>
+
+        <div id="result-message"></div>
+
+        <button id="next-button">العودة إلى قائمة المهام</button>
+    </div>
+
+    <script>
+        let currentTask = null;
+
+        // دالة لعرض السؤال والخيارات
+        function displayTask(task) {
+            currentTask = task;
+            document.getElementById('task-title').textContent = `مهمة: ${task.category}`;
+            document.getElementById('question-text').textContent = task.question;
+            
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = ''; // مسح الخيارات القديمة
+
+            task.options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'option-button';
+                button.textContent = option;
+                button.onclick = () => checkAnswer(button, option, task.answer, task.id);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        // دالة التحقق من الإجابة
+        function checkAnswer(selectedButton, selectedOption, correctAnswer, taskId) {
+            const buttons = document.querySelectorAll('.option-button');
+            const resultMessage = document.getElementById('result-message');
+            
+            // تعطيل جميع الأزرار بعد أول إجابة
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selectedOption === correctAnswer) {
+                // إجابة صحيحة
+                selectedButton.classList.add('correct-answer');
+                resultMessage.className = 'success';
+                resultMessage.innerHTML = '✅ إجابة صحيحة! تم تسجيل إنجازك.';
+                
+                // 📌 تسجيل الإنجاز ومنع إعادة الدخول (الوظيفة من tasks_handler.js)
+                recordTaskCompletion(taskId); 
+                
+                // إظهار زر الانتقال
+                document.getElementById('next-button').style.display = 'block';
+
+            } else {
+                // إجابة خاطئة
+                selectedButton.classList.add('wrong-answer');
+                
+                // تمييز الإجابة الصحيحة
+                buttons.forEach(btn => {
+                    if (btn.textContent === correctAnswer) {
+                        btn.classList.add('correct-answer');
+                    }
+                });
+
+                resultMessage.className = 'error';
+                resultMessage.innerHTML = `❌ إجابة خاطئة. الإجابة الصحيحة هي: **${correctAnswer}**`;
+
+                // إظهار زر الانتقال
+                document.getElementById('next-button').style.display = 'block';
+            }
+
+            resultMessage.style.display = 'block'; // إظهار رسالة النتيجة
+        }
+
+        // عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const taskId = urlParams.get('task_id');
+            
+            if (taskId) {
+                // 1. البحث عن المهمة المطلوبة باستخدام ID
+                const taskData = ALL_TASKS_POOL.find(task => task[0] === taskId);
+                
+                if (taskData) {
+                    const taskObject = {
+                        id: taskData[0],
+                        category: taskData[1],
+                        question: taskData[2],
+                        options: [taskData[3], taskData[4], taskData[5]],
+                        answer: taskData[6]
+                    };
+
+                    // 2. التحقق مما إذا كانت المهمة قد اكتملت بالفعل
+                    if (isTaskCompleted(taskId)) {
+                        document.getElementById('question-text').innerHTML = `<p style="color: var(--gold);">⚠️ لقد أكملت هذه المهمة سابقاً. لا يمكن تكرارها.</p>`;
+                        document.getElementById('options-container').innerHTML = '';
+                        document.getElementById('task-title').textContent = `مهمة مكتملة: ${taskObject.category}`;
+                        document.getElementById('next-button').style.display = 'block';
+                    } else {
+                        // 3. عرض السؤال إذا لم يتم إكماله
+                        displayTask(taskObject);
+                    }
+                } else {
+                    document.getElementById('question-text').innerHTML = `<p style="color: var(--error);">خطأ: لم يتم العثور على المهمة.</p>`;
+                }
+            } else {
+                document.getElementById('question-text').innerHTML = `<p style="color: var(--error);">خطأ: لم يتم تحديد المهمة.</p>`;
+            }
+
+            // وظيفة زر 'العودة'
+            document.getElementById('next-button').onclick = () => {
+                // نأخذ المستخدم لصفحة قائمة المهام مرة أخرى
+                window.history.back(); 
+            };
+        });
+    </script>
+</body>
+</html>
