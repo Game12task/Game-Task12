@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>لوحة تحكم المدير - Game Task</title>
+<style>
+/* -------------------------------------- */
+/* الأنماط الأساسية (CSS) - لوحة المدير */
+/* -------------------------------------- */
+:root{
+  --bg:#0b1220; --card:#071227; --accent:#06b6d4; --muted:#94a3b8; --danger:#ef4444;
+}
+*{box-sizing:border-box;font-family:"Segoe UI",Tahoma,"Noto Kufi Arabic",system-ui,sans-serif;}
+body{margin:0;background-color:var(--bg);color:#e6eef6;padding:20px;}
+.container{max-width:600px;margin:0 auto;background-color:var(--card);padding:25px;border-radius:12px;}
+h1{text-align:center;color:var(--accent);}
+input, button{width:100%;padding:10px;border-radius:8px;border:none;margin-bottom:15px;font-size:16px;}
+input{background-color:rgba(255,255,255,0.05);color:white;}
+button{cursor:pointer;font-weight:700;transition:background-color 0.2s;}
+.search-btn{background-color:var(--accent);color:#022;}
+.reset-btn{background-color:var(--danger);color:white;display:none;} /* سيكون مخفياً في البداية */
+.user-info{
+    margin-top:20px;
+    padding:15px;
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:8px;
+    display:none; /* سيكون مخفياً في البداية */
+}
+.user-info p{margin:5px 0;}
+.user-info .name{font-size:18px;font-weight:700;color:var(--accent);}
+.user-info .points{font-size:24px;font-weight:700;color:var(--danger);}
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDuQsN4n3In6arYu0wkw9gC...", // مفتاحك الخاص
+      authDomain: "mytasktracker-59e00.firebaseapp.com",
+      projectId: "mytasktracker-59e00",
+      storageBucket: "mytasktracker-59e00.appspot.com",
+      messagingSenderId: "433007982533",
+      appId: "1:433007982533:web:99e74c7fa4f0c401d77a06",
+      measurementId: "G-RDZB0YQJNP"
+    };
+
+    // تهيئة Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore(); 
+    const usersCollection = db.collection('users');
+    let currentUserId = null; // لتخزين الآيدي الحالي للعمل عليه
+</script>
+</head>
+<body>
+
+<div class="container">
+    <h1>لوحة تحكم المدير</h1>
+    
+    <input type="text" id="userIdInput" placeholder="أدخل آيدي المستخدم (Firebase ID)">
+    <button class="search-btn" onclick="fetchUser()">البحث عن المستخدم</button>
+    
+    <div id="userInfo" class="user-info">
+        <p>الاسم: <span id="userName" class="name"></span></p>
+        <p>النقاط الحالية: <span id="userPoints" class="points"></span></p>
+    </div>
+    
+    <button class="reset-btn" id="resetButton" onclick="resetPoints()">تصفير النقاط والسحب اليدوي</button>
+    
+    <p id="statusMessage" style="text-align: center; margin-top: 15px; color: yellow;"></p>
+</div>
+
+<script>
+    const userInfoDiv = document.getElementById('userInfo');
+    const userNameSpan = document.getElementById('userName');
+    const userPointsSpan = document.getElementById('userPoints');
+    const resetButton = document.getElementById('resetButton');
+    const statusMessage = document.getElementById('statusMessage');
+
+    // 1. دالة البحث عن المستخدم بالآيدي
+    async function fetchUser() {
+        const userId = document.getElementById('userIdInput').value.trim();
+        statusMessage.textContent = '';
+        userInfoDiv.style.display = 'none';
+        resetButton.style.display = 'none';
+
+        if (!userId) {
+            statusMessage.textContent = 'الرجاء إدخال آيدي المستخدم.';
+            return;
+        }
+
+        try {
+            // استخدام doc(userId) للحصول على المستند مباشرة
+            const doc = await usersCollection.doc(userId).get();
+
+            if (doc.exists) {
+                const userData = doc.data();
+                currentUserId = doc.id;
+                
+                // عرض البيانات
+                userNameSpan.textContent = userData.username;
+                userPointsSpan.textContent = userData.points;
+                
+                userInfoDiv.style.display = 'block';
+                resetButton.style.display = 'block';
+                statusMessage.textContent = 'تم العثور على المستخدم بنجاح.';
+            } else {
+                statusMessage.textContent = 'لم يتم العثور على مستخدم بهذا الآيدي.';
+            }
+        } catch (error) {
+            console.error("خطأ في جلب البيانات:", error);
+            statusMessage.textContent = 'خطأ في جلب البيانات. تأكد من صحة الآيدي.';
+        }
+    }
+
+    // 2. دالة تصفير النقاط
+    async function resetPoints() {
+        if (!currentUserId) {
+            statusMessage.textContent = 'الرجاء البحث عن المستخدم أولاً.';
+            return;
+        }
+
+        if (confirm(`هل أنت متأكد من تصفير نقاط المستخدم ${userNameSpan.textContent}؟ سيتم تعيين النقاط إلى صفر.`)) {
+            try {
+                // تحديث النقاط إلى صفر في قاعدة البيانات
+                await usersCollection.doc(currentUserId).update({ points: 0 });
+                
+                // تحديث واجهة المستخدم
+                userPointsSpan.textContent = 0;
+                statusMessage.textContent = `تم تصفير نقاط المستخدم ${userNameSpan.textContent} بنجاح.`;
+                resetButton.style.display = 'none'; // إخفاء الزر بعد التصفير
+                currentUserId = null; // تفريغ الآيدي
+            } catch (error) {
+                console.error("خطأ في تصفير النقاط:", error);
+                statusMessage.textContent = 'حدث خطأ أثناء تصفير النقاط.';
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
