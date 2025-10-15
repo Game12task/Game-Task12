@@ -4,9 +4,29 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Game Task — عروض الاستبيانات</title>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDuQsN4n3In6arYu0wkw9gC...", // المفتاح الخاص بك (تأكد من أنه نفس الذي نسخته)
+      authDomain: "mytasktracker-59e00.firebaseapp.com",
+      projectId: "mytasktracker-59e00",
+      storageBucket: "mytasktracker-59e00.appspot.com",
+      messagingSenderId: "433007982533",
+      appId: "1:433007982533:web:99e74c7fa4f0c401d77a06",
+      measurementId: "G-RDZB0YQJNP"
+    };
+
+    // تهيئة Firebase وتجهيز قاعدة البيانات
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore(); 
+    const usersCollection = db.collection('users'); // تعريف مجموعة البيانات
+</script>
 <style>
 /* -------------------------------------- */
-/* الأنماط الأساسية (CSS) */
+/* الأنماط الأساسية (CSS) - لم يتم تعديلها */
 /* -------------------------------------- */
 :root{
   --bg:#0b1220; --card:#071227; --accent:#06b6d4; --muted:#94a3b8; --gold:#d4af37;
@@ -76,6 +96,24 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
 </head>
 <body>
 
+<div id="auth-section">
+    <h1>تسجيل/دخول المستخدم</h1>
+    <label for="username">أدخل اسمك:</label><br>
+    <input type="text" id="username" placeholder="الاسم الذي ستستخدمه"><br><br>
+    <button onclick="handleAuth()">دخول / تسجيل فوري</button>
+    <p id="message" style="color: yellow;"></p>
+</div>
+
+<div id="dashboard-section" style="
+    display:none; 
+    padding: 15px; 
+    background-color: #0b1220; 
+    border-bottom: 2px solid #071227;
+    margin-bottom: 20px;
+    color: white;
+">
+    <h3 id="user-display" style="margin: 0;"></h3>
+</div>
 <header>
   <div class="brand">
     <div class="logo">GT</div>
@@ -167,5 +205,86 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
   });
 </script>
 
+<script>
+    // الدالة المسؤولة عن التسجيل أو الدخول
+    async function handleAuth() {
+        const usernameInput = document.getElementById('username').value.trim();
+        const messageElement = document.getElementById('message');
+        
+        if (!usernameInput) {
+            messageElement.textContent = "الرجاء إدخال الاسم.";
+            return;
+        }
+
+        // 1. البحث عن المستخدم بالاسم
+        const querySnapshot = await usersCollection.where('username', '==', usernameInput).get();
+
+        if (querySnapshot.empty) {
+            // --- (أ) مستخدم جديد: تسجيل فوري ---
+            try {
+                const newUserRef = await usersCollection.add({
+                    username: usernameInput,
+                    points: 0
+                });
+                const newUserId = newUserRef.id; 
+                // حفظ الآيدي في المتصفح
+                localStorage.setItem('user_id', newUserId); 
+                displayDashboard(usernameInput, newUserId, 0);
+                messageElement.textContent = `تم تسجيلك بنجاح! الآيدي الخاص بك هو: ${newUserId}`;
+            } catch (error) {
+                messageElement.textContent = "خطأ في التسجيل.";
+            }
+        } else {
+            // --- (ب) مستخدم عائد: تسجيل دخول ---
+            const userData = querySnapshot.docs[0].data();
+            const userId = querySnapshot.docs[0].id;
+            // حفظ الآيدي في المتصفح
+            localStorage.setItem('user_id', userId); 
+            displayDashboard(userData.username, userId, userData.points);
+            messageElement.textContent = `مرحباً بك مجدداً يا ${userData.username}`;
+        }
+    }
+
+    // دالة لعرض شاشة المهام والآيدي
+    function displayDashboard(username, userId, points) {
+        // إخفاء حقول الدخول
+        document.getElementById('auth-section').style.display = 'none';
+        // إظهار شريط عرض الآيدي
+        document.getElementById('dashboard-section').style.display = 'block';
+        // تحديث بيانات المستخدم في الشريط
+        const userDisplay = document.getElementById('user-display');
+        userDisplay.innerHTML = `مرحباً يا ${username} | <b>آيدي المستخدم: ${userId}</b> | النقاط: ${points}`;
+        
+        // إظهار محتوى الموقع الأصلي بعد تسجيل الدخول (Header, Main, Footer)
+        document.querySelector('header').style.display = 'flex'; // تأكد من إظهاره
+        document.querySelector('main').style.display = 'block';
+    }
+    
+    // الدخول التلقائي: التحقق من الآيدي المحفوظ عند تحميل الصفحة
+    window.onload = function() {
+        // إخفاء محتوى الموقع الأصلي قبل التحقق
+        document.querySelector('header').style.display = 'none';
+        document.querySelector('main').style.display = 'none';
+        
+        const storedUserId = localStorage.getItem('user_id');
+        if (storedUserId) {
+            usersCollection.doc(storedUserId).get().then(doc => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                    displayDashboard(userData.username, storedUserId, userData.points);
+                } else {
+                    // إذا لم يوجد الآيدي في القاعدة (ربما تم حذفه)
+                    document.getElementById('auth-section').style.display = 'block';
+                }
+            }).catch(error => {
+                document.getElementById('auth-section').style.display = 'block';
+                console.error("خطأ في الدخول التلقائي:", error);
+            });
+        } else {
+            // إذا لم يكن هناك آيدي محفوظ، اعرض نموذج الدخول
+            document.getElementById('auth-section').style.display = 'block';
+        }
+    }
+</script>
 </body>
 </html>
