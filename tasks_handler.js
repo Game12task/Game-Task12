@@ -1,5 +1,5 @@
 // =======================================================
-// tasks_handler.js - ملف التحكم الديناميكي بمهام الموقع (30 سؤال)
+// tasks_handler.js - ملف التحكم الديناميكي بمهام الموقع (30 سؤال) - (مُعَدَّل)
 // =======================================================
 
 // -------------------------------------------------------
@@ -97,8 +97,13 @@ function getDailyTasksForCategory(category) {
 // 5. دالة التحقق من الإنجاز السابق (منع إعادة الدخول)
 // -------------------------------------------------------
 function isTaskCompleted(taskId) {
-    const userId = localStorage.getItem('user_id');
-    if (!userId) return false;
+    // نفترض أن كل مستخدم لديه مُعرف فريد
+    let userId = localStorage.getItem('user_id');
+    if (!userId) {
+        // إنشاء مُعرف عشوائي إذا لم يكن موجوداً
+        userId = 'user_' + Math.random().toString(36).substring(2, 9);
+        localStorage.setItem('user_id', userId);
+    }
 
     const completedTasks = JSON.parse(localStorage.getItem(`completed_tasks_${userId}`) || '{}');
 
@@ -120,17 +125,38 @@ function recordTaskCompletion(taskId) {
 }
 
 // -------------------------------------------------------
-// 7. دالة عرض قائمة المهام (تستخدم في الصفحة HTML القادمة)
+// 7. دالة عرض قائمة المهام (تستخدم في الصفحة HTML القادمة) - الكود المُعَدَّل
 // -------------------------------------------------------
 function renderTaskList(category) {
     const tasksListContainer = document.getElementById('tasks-list-container');
-    const dailyTasks = getDailyTasksForCategory(category);
+    
+    // **ترجمة الفئة من الإنجليزي إلى العربي لتطابق البيانات**
+    let targetCategory = '';
+    const categoryMap = {
+        'religious': 'ديني',
+        'sports': 'رياضي',
+        'culture': 'ثقافي'
+    };
+    targetCategory = categoryMap[category] || ''; 
+
+    const dailyTasks = getDailyTasksForCategory(targetCategory);
     
     if (!tasksListContainer) return;
+    
+    // تصحيح عنوان الصفحة ليتناسب مع الترجمة
+    const categoryNames = {
+        'religious': 'الدينية',
+        'sports': 'الرياضية',
+        'culture': 'الثقافية'
+    };
+    const categoryTitle = categoryNames[category] || 'المهام';
+    document.getElementById('page-title').textContent = `مهام اليوم ${categoryTitle} (5 أسئلة)`;
+
+
     tasksListContainer.innerHTML = ''; 
 
     if (dailyTasks.length === 0) {
-        tasksListContainer.innerHTML = `<p style="text-align: center; color: #f44336;">عذراً، لا توجد مهام ${category} جديدة متاحة اليوم.</p>`;
+        tasksListContainer.innerHTML = `<p style="text-align: center; color: #f44336;">عذراً، لا توجد مهام ${targetCategory} جديدة متاحة اليوم.</p>`;
         return;
     }
 
@@ -160,4 +186,4 @@ function renderTaskList(category) {
 
         tasksListContainer.appendChild(taskItem);
     });
-}
+    }
