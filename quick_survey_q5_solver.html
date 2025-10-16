@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استبيان 5 أسئلة - الإكمال</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="index.html"></script> <script src="surveys_handler.js"></script>
+    <style>
+        :root{ --bg:#0b1220; --card:#071227; --accent:#06b6d4; --gold:#d4af37; }
+        body { font-family: 'Arial', sans-serif; background: linear-gradient(180deg, #071127 0%, #071a2a 100%); color: #e6eef6; padding: 20px; text-align: right; }
+        .container { max-width: 500px; margin: 50px auto; background-color: var(--card); padding: 30px; border-radius: 12px; text-align: center; }
+        h2 { color: #4CAF50; margin-bottom: 20px; }
+        .reward { color: var(--gold); font-size: 2em; margin: 20px 0; font-weight: bold; }
+        .btn-home { display: inline-block; padding: 12px 25px; background: var(--accent); color: #022; text-decoration: none; border-radius: 8px; font-weight: bold; transition: opacity 0.3s; }
+        .btn-home:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>✅ تهانينا! اكتمل الاستبيان بنجاح</h2>
+        <p style="font-size: 1.1em;">شكراً لمشاركتك في استبيان 5 أسئلة.</p>
+        <div class="reward" id="reward-display"></div>
+        <p style="color: #ccc;">تم إضافة النقاط إلى حسابك. يمكنك الآن العودة للقائمة أو الصفحة الرئيسية.</p>
+        
+        <a href="dynamic_surveys_list.html" class="btn-home">العودة لقائمة الاستبيانات</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const surveyType = 'Q5'; // نوع الاستبيان
+            const reward = getSurveyReward(surveyType);
+            
+            // عرض المكافأة
+            document.getElementById('reward-display').textContent = `+${reward} نقطة`;
+            
+            // 1. تسجيل الإكمال لمنع تكراره اليوم
+            markSurveyCompleted(surveyType);
+            
+            // 2. منح النقاط باستخدام دالة Firebase
+            if (typeof grantPoints === 'function') {
+                grantPoints(reward);
+            } else {
+                console.error("دالة grantPoints غير معرفة!");
+            }
+        });
+    </script>
+
+</body>
+</html>
