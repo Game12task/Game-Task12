@@ -3,57 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تصنيفات المهام</title>
+    <title>اختر النشاط الذهبي</title>
     <style>
-        /* الأنماط مطابقة لملفك index.html لضمان التناسق */
+        /* أنماط متناسقة مع تصميمك */
         :root{--bg:#0b1220; --card:#071227; --accent:#06b6d4; --muted:#94a3b8; --gold:#d4af37;}
-        body{margin:0;background:linear-gradient(180deg,#071127 0%, #071a2a 100%);color:#e6eef6;padding:20px;font-family:"Segoe UI",Tahoma,"Noto Kufi Arabic",system-ui,sans-serif; direction: rtl; text-align: center;}
-        .container { max-width: 600px; margin: 30px auto; background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        h1 { color: var(--accent); margin-bottom: 30px; font-size: 26px; }
-        .category-card {
-            display: block;
-            background: #1a2332;
+        body{
+            margin:0;
+            background:linear-gradient(180deg,#071127 0%, #071a2a 100%);
+            color:#e6eef6;
             padding: 20px;
-            margin: 15px auto;
-            border-radius: 10px;
+            font-family:"Segoe UI",Tahoma,"Noto Kufi Arabic",system-ui,sans-serif; 
+            direction: rtl; 
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 0;
+        }
+        h1 {
+            color: #fff;
+            margin-bottom: 40px;
+            font-size: 28px;
+            text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+        }
+        .activity-card {
+            display: block;
+            width: 100%;
+            padding: 30px 20px;
+            margin: 20px auto;
+            border-radius: 15px;
             text-decoration: none;
             color: #e6eef6;
-            transition: background 0.3s, transform 0.2s;
+            transition: transform 0.3s, box-shadow 0.3s;
             text-align: right;
-            border-left: 5px solid;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+            position: relative;
         }
-        .category-card:hover { transform: translateY(-3px); background: #2a374a; }
+        .activity-card:hover {
+            transform: scale(1.02);
+        }
         
-        .religious-card { border-color: #28a745; } /* ديني */
-        .sports-card { border-color: #007bff; }  /* رياضي */
-        .culture-card { border-color: #ffc107; } /* ثقافي */
+        /* تنسيق بطاقة الاستبيانات (أزرق سماوي) */
+        .survey-card {
+            border: 2px solid var(--accent);
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(6, 182, 212, 0.1));
+        }
+        
+        /* تنسيق بطاقة المهام (ذهبي) */
+        .task-card {
+            border: 2px solid var(--gold);
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.1));
+        }
 
-        .category-card h2 { margin: 0; font-size: 22px; }
-        .category-card p { margin: 5px 0 0; color: var(--muted); }
-
-        .back-link { display: block; margin-top: 30px; color: var(--muted); text-decoration: none; }
+        .activity-card h2 {
+            margin: 0;
+            font-size: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .activity-card p {
+            color: var(--muted);
+            margin: 5px 0 0;
+            font-size: 16px;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 40px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            font-size: 14px;
+        }
+        .back-link:hover {
+            background-color: #555;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>اختر نوع المهام</h1>
+        <h1>اختر النشاط الذهبي</h1>
         
-        <a href="dynamic_task_list.html?category=religious" class="category-card religious-card">
-            <h2>🕋 ديني</h2>
-            <p>أسئلة وألغاز دينية لزيادة الإيمان والمعرفة.</p>
-        </a>
-        
-        <a href="dynamic_task_list.html?category=sports" class="category-card sports-card">
-            <h2>⚽ رياضي</h2>
-            <p>اختبر معلوماتك في كرة القدم والرياضات الأخرى.</p>
-        </a>
-        
-        <a href="dynamic_task_list.html?category=culture" class="category-card culture-card">
-            <h2>🌍 ثقافي</h2>
-            <p>معلومات عامة، جغرافيا، تاريخ، وعلوم.</p>
+        <a href="surveys.html" class="activity-card survey-card">
+            <h2>الاستبيانات <span style="font-size: 35px;">📊</span></h2>
+            <p>عروض وروابط سريعة لكسب نقاط إضافية</p>
         </a>
 
-        <a href="offers.html" class="back-link">🔙 العودة لاختيار النشاط</a>
+        <a href="dynamic_task_list.html" class="activity-card task-card">
+            <h2>المهام <span style="font-size: 35px;">🎮</span></h2>
+            <p>تحديات أسئلة يومية مع مكافآت فورية</p>
+        </a>
+
+        <a href="index.html" class="back-link">🔙 العودة للصفحة الرئيسية</a>
     </div>
 </body>
 </html>
