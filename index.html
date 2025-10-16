@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Game Task — عروض الاستبيانات</title>
+<title>Game Task — لوحة التحكم الرئيسية</title>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -73,25 +73,25 @@ footer{margin-top:22px;color:var(--muted);font-size:13px;text-align:center;}
     font-weight: 700;
     margin-bottom: 10px;
 }
-/* تنسيق خاص لبطاقة التضمين (لجعلها أكبر) */
-.embed-card {
-    /* تجعل البطاقة تأخذ مساحة أكبر في عرض subgrid */
-    grid-column: span 2; 
-    min-height: 450px !important;
-    padding: 0; 
-    overflow: hidden;
-    cursor: default; /* تعطيل مؤشر النقر */
+/* تنسيق خاص لبطاقة التنقل */
+.nav-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
 }
-.embed-card iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    border-radius: 12px;
+.nav-card .icon {
+    font-size: 24px;
+    margin-bottom: 5px;
 }
 
 input, textarea{width:100%;padding:8px;border-radius:6px;border:none;margin-bottom:10px;}
 button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8px;border:0;cursor:pointer;font-weight:700;width:100%;}
-/* لا توجد أكواد للنافذة المنبثقة هنا */
 </style>
 </head>
 <body>
@@ -114,90 +114,93 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
 ">
     <h3 id="user-display" style="margin: 0;"></h3>
 </div>
-<header style="display:none;">
-  <div class="brand">
-    <div class="logo">GT</div>
-    <div>
-      <h1>Game Task — عروض الاستبيانات</h1>
-      <p class="lead">اختر العرض واضغط "اذهب" لفتح الموقع وسيتم تسجيل رابط الإحالة مباشرة.</p>
+
+<main id="main-content" style="display:none;">
+  <header>
+    <div class="brand">
+      <div class="logo">GT</div>
+      <div>
+        <h1>لوحة التحكم الرئيسية</h1>
+        <p class="lead">أهلاً بك! اختر من الأقسام أدناه لتبدأ الكسب.</p>
+      </div>
     </div>
+  </header>
+  
+  <h2 class="section-title" style="margin-top: 25px;">أقسام الموقع الرئيسية</h2>
+  
+  <div class="subgrid">
+      <a href="task_categories.html" class="card nav-card">
+          <div class="icon">⭐</div>
+          <div class="title">المهام اليومية</div>
+      </a>
+      
+      <a href="index.html" class="card nav-card">
+          <div class="icon">💰</div>
+          <div class="title">عروض ومهام خارجية</div>
+      </a>
+      
+      <a href="surveys.html" class="card nav-card survey-card">
+          <div class="icon">📊</div>
+          <div class="title">استطلاعات الرأي</div>
+      </a>
   </div>
-</header>
 
-<a href="offers.html" style="text-decoration: none;">
-    <div class="card gold-card" id="goldCard" style="display:none;">
-        <div class="title">عروض مميزة</div>
-        <div class="counter" id="pointsCounter">النقاط: 0</div>
-        <div class="meta" style="margin-top: 10px;">
-            <span class="btn open-btn" style="width: 100%; text-align: center;">انتقل للعروض الخاصة</span>
+
+  <a href="offers.html" style="text-decoration: none; margin-top: 20px; display: block;">
+      <div class="card gold-card" id="goldCard" style="display:flex;">
+          <div class="title">رصيدك الحالي</div>
+          <div class="counter" id="pointsCounter">النقاط: 0</div>
+          <div class="desc">اضغط للانتقال إلى العروض المخصصة لزيادة النقاط.</div>
+      </div>
+  </a>
+  
+  <div style="margin-bottom:20px; text-align:center;">
+    <p style="color:var(--muted);">إعلان Google</p>
+  </div>
+  
+  <div style="margin-top:30px;">
+      <h2 class="section-title">أشهر منصات الكسب</h2>
+      <div class="grid" id="cardsGrid">
+        <div class="card">
+          <div class="title">Freecash — استبيانات ومهام</div>
+          <div class="desc">اكمل عروض واستبيانات واحصل على نقاط.</div>
+          <div class="meta">
+            <a class="btn open-btn" href="https://freecash.com/r/ST6JL" target="_blank" rel="noopener noreferrer">اذهب</a>
+          </div>
         </div>
-    </div>
-</a>
-<div style="margin-bottom:20px; text-align:center;">
-  <p style="color:var(--muted);">إعلان Google</p>
-</div>
+        <div class="card">
+          <div class="title">PrizeRebel — استبيانات ومهام</div>
+          <div class="desc">سجل وابدأ بالعروض؛ غالبًا تعطي نقاط جيدة.</div>
+          <div class="meta">
+            <a class="btn open-btn" href="https://www.prizerebel.com/index.php?r=16156361" target="_blank" rel="noopener noreferrer">اذهب</a>
+          </div>
+        </div>
+        </div>
+  </div>
 
-<main style="display:none;">
-  <div class="grid" id="cardsGrid">
-    <div class="card">
-      <div class="title">Freecash — استبيانات ومهام</div>
-      <div class="desc">اكمل عروض واستبيانات واحصل على نقاط.</div>
-      <div class="meta">
-        <a class="btn open-btn" href="https://freecash.com/r/ST6JL" target="_blank" rel="noopener noreferrer">اذهب</a>
-      </div>
-    </div>
-    <div class="card">
-      <div class="title">PrizeRebel — استبيانات ومهام</div>
-      <div class="desc">سجل وابدأ بالعروض؛ غالبًا تعطي نقاط جيدة.</div>
-      <div class="meta">
-        <a class="btn open-btn" href="https://www.prizerebel.com/index.php?r=16156361" target="_blank" rel="noopener noreferrer">اذهب</a>
-      </div>
-    </div>
-    <div class="card">
-      <div class="title">TimeBucks — مهام وسرعات</div>
-      <div class="desc">مهام مختلفة: مشاهدة، تسجيل، أفكار سريعة.</div>
-      <div class="meta">
-        <a class="btn open-btn" href="https://timebucks.com/?refID=227024124" target="_blank" rel="noopener noreferrer">اذهب</a>
-      </div>
-    </div>
-    <div class="card">
-      <div class="title">GemsLoot — عروض وكسب</div>
-      <div class="desc">عروض وربح عبر تحميل وتجربة — رابط إحالة.</div>
-      <div class="meta">
-        <a class="btn open-btn" href="https://gemsloot.com/?aff=" target="_blank" rel="noopener noreferrer">اذهب</a>
-      </div>
-    </div>
-    <div class="card">
-      <div class="title">Idle-Empire — مهام وألعاب</div>
-      <div class="desc">من أشهر مواقع المهام والاستبيانات.</div>
-      <div class="meta">
-        <a class="btn open-btn" href="https://www.idle-empire.com?r=fofsqy" target="_blank" rel="noopener noreferrer">اذهب</a>
-      </div>
-    </div>
+
+  <div style="margin-top:30px;">
+    <h2 class="section-title">من نحن</h2>
+    <p style="color:var(--muted);">Game Task هو موقع يقدم الاستبيانات والمهمات لجميع الزوار، مع نظام نقاط متكامل لمكافأة المستخدمين على نشاطهم. هدفنا هو تقديم محتوى متنوع وممتع يجمع بين التعلم والترفيه.</p>
+  </div>
+  
+  <div style="margin-top:20px;">
+    <h2 class="section-title">اتصل بنا</h2>
+    <form id="contactForm">
+      <input type="text" placeholder="الاسم" required>
+      <input type="email" placeholder="البريد الإلكتروني" required>
+      <textarea placeholder="رسالتك" rows="4" required></textarea>
+      <button type="submit" class="send-btn">إرسال</button>
+    </form>
   </div>
 </main>
-
-<div style="margin-top:30px;">
-  <h2 class="section-title">من نحن</h2>
-  <p style="color:var(--muted);">Game Task هو موقع يقدم الاستبيانات والمهمات لجميع الزوار، مع نظام نقاط متكامل لمكافأة المستخدمين على نشاطهم. هدفنا هو تقديم محتوى متنوع وممتع يجمع بين التعلم والترفيه.</p>
-</div>
-
-<div style="margin-top:20px;">
-  <h2 class="section-title">اتصل بنا</h2>
-  <form id="contactForm">
-    <input type="text" placeholder="الاسم" required>
-    <input type="email" placeholder="البريد الإلكتروني" required>
-    <textarea placeholder="رسالتك" rows="4" required></textarea>
-    <button type="submit" class="send-btn">إرسال</button>
-  </form>
-</div>
 
 <footer>
   ملاحظة: يمكنك إضافة كود Google AdSense في الأماكن المخصصة للإعلانات.
 </footer>
 
 <script>
-  // تم حذف جميع أكواد الجافاسكريبت المتعلقة بالاستبيانات، وبقي فقط نموذج الاتصال
+  // أكواد الجافاسكريبت المتبقية
   document.getElementById('contactForm').addEventListener('submit', function(e) {
     e.preventDefault();
     alert('تم إرسال رسالتك بنجاح!');
@@ -252,21 +255,22 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
         // إظهار شريط عرض الآيدي
         document.getElementById('dashboard-section').style.display = 'block';
         
-        // إظهار محتوى الموقع الأصلي بعد تسجيل الدخول (Header, Gold Card, Main)
-        document.querySelector('header').style.display = 'flex'; 
-        document.getElementById('goldCard').style.display = 'flex'; // إظهار القالب الذهبي
-        document.querySelector('main').style.display = 'block';
+        // **إظهار محتوى الموقع الأساسي (بدلاً من الأقسام الفرعية التي كانت مخفية)**
+        document.getElementById('main-content').style.display = 'block'; 
         
         // تحديث بيانات المستخدم في الشريط
         const userDisplay = document.getElementById('user-display');
         userDisplay.innerHTML = `مرحباً يا ${username} | <b>آيدي المستخدم: ${userId}</b> | النقاط: ${points}`;
+        
+        // تحديث النقاط في البطاقة الذهبية (إذا كانت موجودة)
+        const pointsCounter = document.getElementById('pointsCounter');
+        if (pointsCounter) {
+            pointsCounter.textContent = `النقاط: ${points}`;
+        }
     }
     
     // الدخول التلقائي: التحقق من الآيدي المحفوظ عند تحميل الصفحة
     window.onload = function() {
-        // إخفاء محتوى الموقع الأصلي قبل التحقق (لضمان ظهور نموذج الدخول فقط في البداية)
-        // Header و Main تم إخفاؤهما بالفعل عبر style="display:none" في HTML
-        
         const storedUserId = localStorage.getItem('user_id');
         if (storedUserId) {
             usersCollection.doc(storedUserId).get().then(doc => {
@@ -274,7 +278,6 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
                     const userData = doc.data();
                     displayDashboard(userData.username, storedUserId, userData.points);
                 } else {
-                    // إذا لم يوجد الآيدي في القاعدة (ربما تم حذفه)، اعرض نموذج الدخول
                     document.getElementById('auth-section').style.display = 'block';
                 }
             }).catch(error => {
@@ -282,7 +285,6 @@ button.send-btn{background:var(--accent);color:#022;padding:10px;border-radius:8
                 console.error("خطأ في الدخول التلقائي:", error);
             });
         } else {
-            // إذا لم يكن هناك آيدي محفوظ، اعرض نموذج الدخول
             document.getElementById('auth-section').style.display = 'block';
         }
     }
