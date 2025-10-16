@@ -1,4 +1,4 @@
-// surveys_handler.js - ملف لمعالجة وتدوير أسئلة الاستبيانات
+// surveys_handler.js - ملف لمعالجة وتدوير أسئلة الاستبيانات (مُعَدَّل ونهائي)
 
 // -----------------------------------------------------
 // 1. قاعدة بيانات الأسئلة (استبيان 5 أسئلة - Q5)
@@ -71,15 +71,17 @@ const SURVEY_Q10_DAY2 = [
     { ID: 'S10-B10', category: 'Math', question: 'ما هو أصغر عدد أولي؟', answer: '2' },
 ];
 
-
 // -----------------------------------------------------
-// 4. دالة تحديد مجموعة أسئلة اليوم (تم تحديثها)
+// 4. دالة تحديد مجموعة أسئلة اليوم (المنطق)
 // -----------------------------------------------------
 function getCurrentSurveySet(surveyType) {
     const today = new Date();
-    const dayOfMonth = today.getDate(); 
-    const isDayOne = dayOfMonth % 2 !== 0; 
-    
+    // نستخدم دورة الأيام لتحديد مفتاح التدوير (Day1 أو Day2)
+    const dayOfWeek = today.getDay(); // الأحد 0، الإثنين 1، ...، السبت 6
+
+    // نعتمد نفس منطق المهام: الأيام الفردية Day1 والأيام الزوجية Day2
+    const isDayOne = (dayOfWeek === 0 || dayOfWeek === 2 || dayOfWeek === 4); 
+
     if (surveyType === 'Q5') {
         return isDayOne ? SURVEY_Q5_DAY1 : SURVEY_Q5_DAY2;
     } 
@@ -96,18 +98,45 @@ function getCurrentSurveySet(surveyType) {
 }
 
 // -----------------------------------------------------
-// 5. دالة التحقق من التجديد اليومي
+// 5. دالة جلب مكافأة الاستبيان
 // -----------------------------------------------------
-function isSurveyAvailable(surveyID) {
-    const lastCompletionDate = localStorage.getItem(`survey_${surveyID}_last_completed`);
-    if (!lastCompletionDate) {
-        return true; 
+function getSurveyReward(surveyType) {
+    switch(surveyType) {
+        case 'Q5': return 5;
+        case 'Q7': return 7;
+        case 'Q10': return 10;
+        default: return 0;
     }
+}
+
+// -----------------------------------------------------
+// 6. دالة التحقق من التجديد اليومي (تستخدم في صفحات الـ start)
+// -----------------------------------------------------
+function isSurveyAvailable(surveyType) {
+    const userId = localStorage.getItem('user_id');
+    if (!userId) return false; 
+    
+    const lastCompletionKey = `survey_completed_${userId}_${surveyType}`;
+    const lastCompletionDate = localStorage.getItem(lastCompletionKey);
+    
+    // الحصول على تاريخ اليوم فقط (بدون الوقت)
     const today = new Date().toDateString(); 
+    
+    // إذا لم يكملها سابقاً أو كانت آخر مرة ليست اليوم
     return lastCompletionDate !== today;
 }
 
-function markSurveyCompleted(surveyID) {
+// -----------------------------------------------------
+// 7. دالة تسجيل الإنجاز (تستخدم في صفحات الحل)
+// -----------------------------------------------------
+function markSurveyCompleted(surveyType) {
+    const userId = localStorage.getItem('user_id');
+    if (!userId) return;
+
+    const lastCompletionKey = `survey_completed_${userId}_${surveyType}`;
     const today = new Date().toDateString();
-    localStorage.setItem(`survey_${surveyID}_last_completed`, today);
+    localStorage.setItem(lastCompletionKey, today);
+    
+    // ملاحظة: دالة منح النقاط (grantPoints) يجب أن تكون موجودة في مكان يمكن الوصول إليه (مثل index.html أو utils.js)
+    // عند استدعاء هذه الدالة في صفحة الحل، يجب أن تتبعها باستدعاء grantPoints(getSurveyReward(surveyType));
 }
