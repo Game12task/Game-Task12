@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>حل استبيان 10 أسئلة</title>
+
+<script src="surveys_handler.js"></script>
+
+<style>
+    :root{--bg:#0b1220; --card:#071227; --accent:#06b6d4; --muted:#94a3b8; --gold:#d4af37;}
+    *{box-sizing:border-box;font-family:"Segoe UI",Tahoma,"Noto Kufi Arabic",system-ui,sans-serif;}
+    body{margin:0;background:linear-gradient(180deg,#071127 0%, #071a2a 100%);color:#e6eef6;padding:20px;display:flex;justify-content:center;align-items:center;min-height:100vh;}
+    .container{max-width:600px;width:100%;padding:20px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;border:1px solid rgba(255,255,255,0.05);text-align:center;}
+    h1{font-size:24px;color:var(--accent);margin-bottom:10px;}
+    p{color:var(--muted);font-size:16px;margin-bottom:20px;}
+    .question-box{background:#0a1730;padding:20px;border-radius:10px;margin-bottom:20px;}
+    #questionCounter{color:var(--gold);font-weight:700;margin-bottom:10px;}
+    #question{font-size:20px;font-weight:700;margin-bottom:20px;}
+    input[type="text"]{width:100%;padding:10px;border-radius:6px;border:none;margin-bottom:15px;font-size:16px;background:#1e293b;color:#e6eef6;}
+    button{padding:12px 25px;border-radius:6px;border:0;cursor:pointer;font-weight:700;font-size:16px;background:linear-gradient(90deg,var(--accent),#0891b2);color:#022;width:100%;}
+    #statusMessage{margin-top:15px;font-weight:700;min-height:20px;}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>حل استبيان 10 أسئلة</h1>
+    <div class="question-box">
+        <div id="questionCounter"></div>
+        <div id="question">جاري تحميل السؤال...</div>
+    </div>
+    
+    <input type="text" id="answer" placeholder="اكتب إجابتك هنا" onkeypress="if(event.keyCode==13) document.getElementById('submitBtn').click()">
+    <button id="submitBtn" onclick="checkAnswer()">تأكيد الإجابة</button>
+    
+    <div id="statusMessage"></div>
+</div>
+
+<script>
+    // مُعرّف الاستبيان وعدد النقاط المراد منحها
+    const SURVEY_ID = 'quick_10q'; // ⭐️ نستخدم Q10 ⭐️
+    const POINTS_REWARD = 10; // ⭐️ منح 10 نقاط لهذا الاستبيان ⭐️
+
+    // جلب مجموعة الأسئلة الخاصة باليوم
+    let questions = [];
+    const storedSet = localStorage.getItem('current_survey_set_Q10'); // ⭐️ جلب أسئلة Q10 ⭐️
+    
+    if (storedSet) {
+        questions = JSON.parse(storedSet);
+    } else {
+        alert('حدث خطأ في تحميل أسئلة الاستبيان. يرجى المحاولة مرة أخرى.');
+        window.location.href = 'quick_survey_start_10q.html'; // ⭐️ العودة لصفحة بداية Q10 ⭐️
+    }
+
+    let currentQuestionIndex = 0;
+    let correctAnswers = 0;
+
+    const questionElement = document.getElementById('question');
+    const answerInput = document.getElementById('answer');
+    const statusMessage = document.getElementById('statusMessage');
+    const questionCounter = document.getElementById('questionCounter');
+
+    function loadQuestion() {
+        if (currentQuestionIndex < questions.length) {
+            questionElement.textContent = questions[currentQuestionIndex].question;
+            questionCounter.textContent = `السؤال ${currentQuestionIndex + 1} من ${questions.length}`;
+            answerInput.value = '';
+            statusMessage.textContent = '';
+        } else {
+            // الاستبيان انتهى!
+            const totalQuestions = questions.length;
+            const successRate = (correctAnswers / totalQuestions);
+            
+            // ⭐️ شرط النجاح: 60% إجابات صحيحة على الأقل ⭐️
+            if (successRate >= 0.6) {
+                markSurveyCompleted(SURVEY_ID);
+                grantPoints(POINTS_REWARD);
+                alert(`تهانينا! نجحت في الاستبيان.\nتم منحك ${POINTS_REWARD} نقطة!`);
+            } else {
+                alert(`لم تنجح. يجب أن تحصل على 60% إجابات صحيحة على الأقل.\nعدد إجاباتك الصحيحة: ${correctAnswers} من ${totalQuestions}`);
+            }
+
+            window.location.href = 'index.html';
+        }
+    }
+
+    function checkAnswer() {
+        const userAnswer = answerInput.value.trim().toLowerCase();
+        const correctAnswer = questions[currentQuestionIndex].answer.trim().toLowerCase();
+        
+        if (userAnswer === correctAnswer) {
+            statusMessage.textContent = 'إجابة صحيحة! ✅';
+            statusMessage.style.color = '#4ade80'; 
+            correctAnswers++;
+        } else {
+            statusMessage.textContent = `إجابة خاطئة. الصحيح: ${questions[currentQuestionIndex].answer} ❌`;
+            statusMessage.style.color = '#f87171'; 
+        }
+
+        setTimeout(() => {
+            currentQuestionIndex++;
+            loadQuestion();
+        }, 1500); 
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
