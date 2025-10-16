@@ -6,6 +6,7 @@
     <title>مهام اليوم المتجددة</title>
     <script src="tasks_handler.js"></script>
     <style>
+        /* CSS الخاص بك بدون تغيير */
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f4f7f6;
@@ -64,6 +65,8 @@
         .completed {
             background-color: #f44336; /* أحمر لـ 'مكتمل' */
             color: white;
+            opacity: 0.7; /* لتمييز المكتملة */
+            pointer-events: none; /* لمنع الضغط عليها */
         }
         #tasks-list-container {
             display: flex;
@@ -76,7 +79,7 @@
 
     <div class="header">
         <h1 id="page-title">قائمة مهام اليوم</h1>
-        <p>المهام متجددة يومياً. استكمل المهام المتاحة الآن!</p>
+        <p id="page-subtitle">المهام متجددة يومياً. استكمل المهام المتاحة الآن!</p>
     </div>
 
     <div id="tasks-list-container">
@@ -84,26 +87,62 @@
     </div>
 
     <script>
-        // هذا الكود يتأكد من تحميل الصفحة ثم يبدأ بعرض القائمة
+        // دالة يتم استدعاؤها لعرض قائمة المهام
+        function renderTaskList(category) {
+            const container = document.getElementById('tasks-list-container');
+            
+            // استدعاء دالة جلب المهام من tasks_handler.js
+            const dailyTasks = getCurrentDailyTasks(category);
+            
+            container.innerHTML = ''; // مسح رسالة "جاري التحميل"
+
+            if (dailyTasks.length === 0) {
+                container.innerHTML = `<p style="color: #555; text-align: center;">لا توجد مهام متاحة حالياً في فئة ${category}.</p>`;
+                return;
+            }
+
+            dailyTasks.forEach(task => {
+                const isCompleted = isTaskCompleted(task.id);
+                const taskCard = document.createElement('div');
+                taskCard.className = `task-item-card ${isCompleted ? 'completed' : 'available'}`;
+                taskCard.onclick = isCompleted ? null : () => redirectToSolver(task);
+                
+                // تحديد النص والعنوان
+                taskCard.innerHTML = `
+                    <h3>${task.question}</h3>
+                    <p>المكافأة: ${task.reward} نقطة</p>
+                    <span class="status">${isCompleted ? 'مكتملة ✅' : 'متاحة'}</span>
+                `;
+                container.appendChild(taskCard);
+            });
+        }
+
+        // دالة التوجيه لصفحة الحل (تحتاج إلى التأكد من أنها تتوافق مع صفحة الحل الخاصة بك)
+        function redirectToSolver(task) {
+            // نمرر ID المهمة ومكافأتها لصفحة الحل
+            const url = `dynamic_task_question_solver.html?taskId=${task.id}&reward=${task.reward}&answer=${encodeURIComponent(task.answer)}`;
+            window.location.href = url;
+        }
+
+
+        // تشغيل المنطق عند تحميل الصفحة
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const category = urlParams.get('category');
+            const category = urlParams.get('category'); // سيجلب القيمة مثل 'ديني' أو 'ثقافي'
             
             if (category) {
-                // تحديد اسم الفئة للعرض في العنوان
-                const categoryNames = {
-                    'religious': 'الدينية',
-                    'sports': 'الرياضية',
-                    'culture': 'الثقافية'
-                };
-                const categoryTitle = categoryNames[category] || 'المهام';
-                // بما أننا نستخدم 5 أسئلة من كل فئة في اليوم
-                document.getElementById('page-title').textContent = `مهام اليوم ${categoryTitle} (5 أسئلة)`;
+                // تحديث العنوان بناءً على الفئة العربية
+                document.getElementById('page-title').textContent = `مهام اليوم - ${category}`;
+                document.getElementById('page-subtitle').textContent = `استكمل المهام المتاحة الآن! (كل مهمة تُنجز تمنح نقطة واحدة)`;
                 
-                // استدعاء الدالة التي تم تعريفها في tasks_handler.js
+                // عرض القائمة للفئة المحددة
                 renderTaskList(category);
             } else {
-                document.getElementById('tasks-list-container').innerHTML = `<p style="color: red; text-align: center;">خطأ: لم يتم تحديد فئة المهام.</p>`;
+                document.getElementById('tasks-list-container').innerHTML = `<p style="color: red; text-align: center;">
+                    خطأ: لم يتم تحديد فئة المهام. يرجى العودة للصفحة الرئيسية واختيار الفئة.
+                    <a href="task_categories_list.html" style="color: #3f51b5; display: block; margin-top: 15px; text-decoration: none;">الانتقال لصفحة الفئات</a>
+                </p>`;
+                document.getElementById('page-title').textContent = 'خطأ في التحميل';
             }
         });
     </script>
