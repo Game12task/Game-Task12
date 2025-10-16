@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>اختر الاستبيان</title>
+<style>
+    :root{--bg:#0b1220; --card:#071227; --accent:#06b6d4; --muted:#94a3b8; --gold:#d4af37;}
+    *{box-sizing:border-box;font-family:"Segoe UI",Tahoma,"Noto Kufi Arabic",system-ui,sans-serif;}
+    body{margin:0;background:linear-gradient(180deg,#071127 0%, #071a2a 100%);color:#e6eef6;padding:20px;min-height:100vh;}
+    .container{max-width:600px;margin:40px auto;padding:20px;background:var(--card);border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,0.2);}
+    h1{text-align:center;color:var(--accent);margin-bottom:30px;}
+    .list-group a{display:block;background:#1e293b;color:#e6eef6;padding:15px;margin-bottom:15px;border-radius:8px;text-decoration:none;font-size:18px;font-weight:600;transition:background 0.3s, transform 0.2s;display: flex; justify-content: space-between; align-items: center;}
+    .list-group a:hover{background:#334155;transform:scale(1.02);}
+    .list-group a .points{color:var(--gold);font-weight:700;}
+    .back-link{display:block;text-align:center;margin-top:25px;color:var(--muted);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>اختر استبيان اليوم</h1>
+    <div class="list-group">
+        <a href="quick_survey_start_5q.html">
+            <span>استبيان سريع (5 أسئلة)</span>
+            <span class="points">5 نقاط</span>
+        </a>
+        <a href="quick_survey_start_7q.html">
+            <span>استبيان يومي (7 أسئلة)</span>
+            <span class="points">7 نقاط</span>
+        </a>
+        <a href="quick_survey_start_10q.html">
+            <span>استبيان شامل (10 أسئلة)</span>
+            <span class="points">10 نقاط</span>
+        </a>
+    </div>
+    <a href="index.html" class="back-link">العودة للصفحة الرئيسية</a>
+</div>
+</body>
+</html>
