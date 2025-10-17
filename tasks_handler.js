@@ -1,8 +1,7 @@
-// tasks_handler.js - ملف لمعالجة المهام اليومية
+// tasks_handler.js - ملف لمعالجة المهام اليومية (تم تحديثه لدعم تصفية الفئات)
 
 // -----------------------------------------------------
 // 1. قاعدة بيانات المهام اليومية (5 أسئلة لكل يوم)
-// تحتوي كل مهمة على (question, options, correctAnswer, points)
 // -----------------------------------------------------
 
 // المهام ليوم الأحد، الثلاثاء، الخميس (Day 1)
@@ -105,15 +104,23 @@ const DAILY_TASKS_DAY2 = [
 
 
 // -----------------------------------------------------
-// 2. دالة جلب المهام لليوم الحالي (منطق التدوير)
+// 2. دالة جلب المهام لليوم الحالي (منطق التدوير والتصفية)
 // -----------------------------------------------------
-function getCurrentDailyTasks() {
+function getCurrentDailyTasks(category = null) { // 💡 تم إضافة متغير category
     const today = new Date();
     const dayOfWeek = today.getDay(); 
     // يوم 0 هو الأحد، يوم 1 هو الإثنين
     const isDayOne = (dayOfWeek === 0 || dayOfWeek === 2 || dayOfWeek === 4); 
 
-    return isDayOne ? DAILY_TASKS_DAY1 : DAILY_TASKS_DAY2;
+    const allTasks = isDayOne ? DAILY_TASKS_DAY1 : DAILY_TASKS_DAY2;
+
+    // إذا لم يتم تمرير فئة، نرجع جميع المهام (5 أسئلة).
+    if (!category) {
+        return allTasks;
+    }
+    
+    // إذا تم تحديد فئة، نرجع المهمة التي تطابق الفئة فقط (سؤال واحد).
+    return allTasks.filter(task => task.category.toLowerCase() === category.toLowerCase());
 }
 
 // -----------------------------------------------------
@@ -121,15 +128,14 @@ function getCurrentDailyTasks() {
 // -----------------------------------------------------
 function isTaskAvailable(taskId) {
     const userId = localStorage.getItem('user_id');
+    // إذا لم يكن هناك User ID، افترض أنها غير متاحة (أو عدّل هذا الشرط إذا كنت لا تحتاج تسجيل دخول)
     if (!userId) return false; 
     
-    // المفتاح للتخزين: task_completed_USERID_TASKID
     const completionKey = `task_completed_${userId}_${taskId}`;
     const lastCompletionDate = localStorage.getItem(completionKey);
     
     const today = new Date().toDateString(); 
     
-    // المهمة متاحة إذا لم يتم إكمالها اليوم
     return lastCompletionDate !== today;
 }
 
