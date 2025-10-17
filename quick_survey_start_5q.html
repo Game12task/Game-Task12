@@ -3,64 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بداية استبيان سريع 5 أسئلة</title>
+    <title>بدء استبيان 5 أسئلة</title>
+    <script src="surveys_handler.js"></script>
     <style>
-        /* الأنماط مطابقة لتصميمك الحالي */
-        :root{--bg:#0b1220; --card:#071227; --accent:#06b6d4; --muted:#94a3b8; --gold:#d4af37;}
-        body{margin:0;background:linear-gradient(180deg,#071127 0%, #071a2a 100%);color:#e6eef6;padding:20px;font-family:"Segoe UI",Tahoma,"Noto Kufi Arabic",system-ui,sans-serif; direction: rtl; text-align: center;}
-        .container { max-width: 600px; margin: 50px auto; background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        h1 { color: #e74c3c; font-size: 26px; margin-bottom: 20px; }
-        p { color: var(--muted); font-size: 16px; line-height: 1.6; margin-bottom: 30px; }
-        .instructions { background: #3c3c3c; padding: 15px; border-radius: 8px; margin-bottom: 30px; text-align: right; }
-        .instructions strong { color: white; display: block; margin-bottom: 5px; }
-        .ad-space { 
-            background: #3c3c3c; 
-            height: 150px; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white; 
-            border-radius: 8px; 
-            margin-top: 30px; 
-            font-size: 20px;
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: right;
+            padding: 20px;
         }
-        .start-btn {
-            display: inline-block;
-            background: #e74c3c;
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        h1 {
+            color: #3f51b5;
+            text-align: center;
+        }
+        .start-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background-color: #4CAF50;
             color: white;
-            text-decoration: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            font-weight: 700;
-            border-radius: 8px;
-            transition: background 0.3s;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s;
         }
-        .start-btn:hover { background: #c0392b; }
-        .back-link { display: block; margin-top: 20px; color: var(--muted); text-decoration: none; font-size: 14px; }
+        .start-button:hover {
+            background-color: #45a049;
+        }
+        .message {
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .success {
+            background-color: #c8e6c9;
+            color: #388e3c;
+        }
+        .error {
+            background-color: #ffcdd2;
+            color: #d32f2f;
+        }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1>استبيان الرأي السريع (5 أسئلة)</h1>
+        <h1>استبيان الـ 5 أسئلة</h1>
+        <div id="status-message" class="message"></div>
         
-        <p>هذا استبيان رأي بسيط لا يتطلب إجابات صحيحة. هدفنا هو جمع الآراء فقط.</p>
-        
-        <div class="instructions">
-            <strong>ملاحظة هامة:</strong>
-            <ul>
-                <li>هناك إعلان AdSense بين كل سؤال وآخر.</li>
-                <li>يجب الضغط على الزر "التالي" بعد الإجابة ومشاهدة الإعلان.</li>
-                <li>سيتم منحك **20 نقطة** فور الانتهاء.</li>
-            </ul>
-        </div>
-        
-        <div class="ad-space">
-            **ضع كود إعلان AdSense الأول هنا (إعلان عرضي/رأسي)**
-        </div>
-
-        <a href="quick_survey_q5_1.html" class="start-btn">ابدأ الاستبيان الآن</a>
-
-        <a href="surveys_list.html" class="back-link">🔙 العودة لقائمة الاستبيانات</a>
+        <button id="start-btn" class="start-button">ابدأ الاستبيان الآن</button>
+        <button id="back-btn" class="start-button" style="background-color: #f44336; display: none;" onclick="window.location.href='index.html'">العودة للصفحة الرئيسية</button>
     </div>
+
+    <script>
+        const SURVEY_TYPE = 'Q5';
+        const statusMessage = document.getElementById('status-message');
+        const startButton = document.getElementById('start-btn');
+        const backButton = document.getElementById('back-btn');
+
+        // 1. التحقق من التوفر عند تحميل الصفحة
+        if (!isSurveyAvailable(SURVEY_TYPE)) {
+            statusMessage.textContent = "لقد أكملت استبيان الـ 5 أسئلة اليوم. يرجى المحاولة غدًا.";
+            statusMessage.className = 'message error';
+            startButton.style.display = 'none';
+            backButton.style.display = 'block';
+        } else {
+            statusMessage.textContent = "استبيان يومي جديد متاح الآن. اضغط للبدء.";
+            statusMessage.className = 'message success';
+            startButton.style.display = 'block';
+        }
+
+        // 2. معالج حدث البدء
+        startButton.onclick = function() {
+            // جلب مجموعة الأسئلة وتخزينها
+            const currentQuestions = getCurrentSurveySet(SURVEY_TYPE);
+            
+            if (currentQuestions && currentQuestions.length > 0) {
+                // حفظ الأسئلة في الذاكرة المؤقتة (هنا يكمن حل المشكلة)
+                localStorage.setItem(`current_survey_set_${SURVEY_TYPE}`, JSON.stringify(currentQuestions));
+                
+                // التوجيه لصفحة الحل
+                window.location.href = 'quick_survey_q5_1.html'; 
+            } else {
+                statusMessage.textContent = "خطأ: لم يتم تحميل الأسئلة من قاعدة البيانات. يرجى التحقق من ملف surveys_handler.js.";
+                statusMessage.className = 'message error';
+            }
+        };
+    </script>
 </body>
 </html>
