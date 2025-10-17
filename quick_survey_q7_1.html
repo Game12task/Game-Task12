@@ -1,111 +1,229 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>حل استبيان 7 أسئلة</title>
-
-<script src="surveys_handler.js"></script>
-
-<style>
-    :root{--bg:#0b1220; --card:#071227; --accent:#06b6d4; --muted:#94a3b8; --gold:#d4af37;}
-    *{box-sizing:border-box;font-family:"Segoe UI",Tahoma,"Noto Kufi Arabic",system-ui,sans-serif;}
-    body{margin:0;background:linear-gradient(180deg,#071127 0%, #071a2a 100%);color:#e6eef6;padding:20px;display:flex;justify-content:center;align-items:center;min-height:100vh;}
-    .container{max-width:600px;width:100%;padding:20px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;border:1px solid rgba(255,255,255,0.05);text-align:center;}
-    h1{font-size:24px;color:var(--accent);margin-bottom:10px;}
-    p{color:var(--muted);font-size:16px;margin-bottom:20px;}
-    .question-box{background:#0a1730;padding:20px;border-radius:10px;margin-bottom:20px;}
-    #questionCounter{color:var(--gold);font-weight:700;margin-bottom:10px;}
-    #question{font-size:20px;font-weight:700;margin-bottom:20px;}
-    input[type="text"]{width:100%;padding:10px;border-radius:6px;border:none;margin-bottom:15px;font-size:16px;background:#1e293b;color:#e6eef6;}
-    button{padding:12px 25px;border-radius:6px;border:0;cursor:pointer;font-weight:700;font-size:16px;background:linear-gradient(90deg,var(--accent),#0891b2);color:#022;width:100%;}
-    #statusMessage{margin-top:15px;font-weight:700;min-height:20px;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حل الاستبيان السريع</title>
+    <script src="surveys_handler.js"></script>
+    <script src="firebase_init.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            text-align: right;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #3f51b5;
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        #question-box {
+            background-color: #e3f2fd;
+            border: 1px solid #bbdefb;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #1976d2;
+        }
+        .option-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: right;
+            transition: background-color 0.3s, border-color 0.3s;
+            font-size: 1em;
+        }
+        .option-button:hover:not(.disabled) {
+            background-color: #f0f0f0;
+        }
+        .option-button.selected {
+            background-color: #90caf9; /* تمييز الاختيار */
+            border-color: #42a5f5;
+        }
+        .disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        #status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+        }
+        .info {
+            background-color: #c8e6c9; /* لون أخضر فاتح للتأكيد */
+            color: #388e3c;
+        }
+        #next-task-button {
+            display: none;
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+        }
+        #question-counter {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>حل استبيان 7 أسئلة</h1>
-    <div class="question-box">
-        <div id="questionCounter"></div>
-        <div id="question">جاري تحميل السؤال...</div>
+    <div class="container">
+        <h1 id="survey-title">حل الاستبيان</h1>
+        
+        <div id="question-counter"></div>
+        
+        <div id="question-box">جاري تحميل الأسئلة...</div>
+        
+        <div id="options-container">
+            </div>
+
+        <div id="status-message"></div>
+        
+        <button id="next-task-button" onclick="goToHome()">العودة إلى الصفحة الرئيسية</button>
     </div>
-    
-    <input type="text" id="answer" placeholder="اكتب إجابتك هنا" onkeypress="if(event.keyCode==13) document.getElementById('submitBtn').click()">
-    <button id="submitBtn" onclick="checkAnswer()">تأكيد الإجابة</button>
-    
-    <div id="statusMessage"></div>
-</div>
 
-<script>
-    // مُعرّف الاستبيان وعدد النقاط المراد منحها
-    const SURVEY_ID = 'quick_7q'; // ⭐️ نستخدم Q7 ⭐️
-    const POINTS_REWARD = 7; // ⭐️ منح 7 نقاط لهذا الاستبيان ⭐️
+    <script>
+        // **1. المتغير الرئيسي:** هنا نحدد نوع الاستبيان
+        const SURVEY_TYPE = 'Q7'; 
+        
+        let questions = [];
+        let currentQuestionIndex = 0;
+        
+        const questionElement = document.getElementById('question-box');
+        const optionsContainer = document.getElementById('options-container');
+        const statusMessage = document.getElementById('status-message');
+        const questionCounter = document.getElementById('question-counter');
+        const nextTaskButton = document.getElementById('next-task-button');
+        const surveyTitle = document.getElementById('survey-title');
 
-    // جلب مجموعة الأسئلة الخاصة باليوم
-    let questions = [];
-    const storedSet = localStorage.getItem('current_survey_set_Q7'); // ⭐️ جلب أسئلة Q7 ⭐️
-    
-    if (storedSet) {
-        questions = JSON.parse(storedSet);
-    } else {
-        alert('حدث خطأ في تحميل أسئلة الاستبيان. يرجى المحاولة مرة أخرى.');
-        window.location.href = 'quick_survey_start_7q.html'; // ⭐️ العودة لصفحة بداية Q7 ⭐️
-    }
+        // 1. بدء العملية وتحميل الأسئلة
+        function initializeSurvey() {
+            surveyTitle.textContent = `استبيان الـ ${SURVEY_TYPE.substring(1)} أسئلة`;
 
-    let currentQuestionIndex = 0;
-    let correctAnswers = 0;
-
-    const questionElement = document.getElementById('question');
-    const answerInput = document.getElementById('answer');
-    const statusMessage = document.getElementById('statusMessage');
-    const questionCounter = document.getElementById('questionCounter');
-
-    function loadQuestion() {
-        if (currentQuestionIndex < questions.length) {
-            questionElement.textContent = questions[currentQuestionIndex].question;
-            questionCounter.textContent = `السؤال ${currentQuestionIndex + 1} من ${questions.length}`;
-            answerInput.value = '';
-            statusMessage.textContent = '';
-        } else {
-            // الاستبيان انتهى!
-            const totalQuestions = questions.length;
-            const successRate = (correctAnswers / totalQuestions);
-            
-            // ⭐️ شرط النجاح: 60% إجابات صحيحة على الأقل ⭐️
-            if (successRate >= 0.6) {
-                markSurveyCompleted(SURVEY_ID);
-                grantPoints(POINTS_REWARD);
-                alert(`تهانينا! نجحت في الاستبيان.\nتم منحك ${POINTS_REWARD} نقطة!`);
-            } else {
-                alert(`لم تنجح. يجب أن تحصل على 60% إجابات صحيحة على الأقل.\nعدد إجاباتك الصحيحة: ${correctAnswers} من ${totalQuestions}`);
+            // التحقق من التوفر (دالة isSurveyAvailable من surveys_handler.js)
+            if (!isSurveyAvailable(SURVEY_TYPE)) {
+                questionElement.innerHTML = "لقد أكملت هذا الاستبيان اليوم أو حدث خطأ. يرجى العودة لصفحة البداية.";
+                nextTaskButton.style.display = 'block';
+                optionsContainer.style.display = 'none';
+                return;
             }
 
-            window.location.href = 'index.html';
-        }
-    }
+            const storedSet = localStorage.getItem(`current_survey_set_${SURVEY_TYPE}`); 
+            
+            if (!storedSet) {
+                questionElement.textContent = 'حدث خطأ في تحميل الاستبيان. يرجى البدء من جديد.';
+                nextTaskButton.style.display = 'block';
+                optionsContainer.style.display = 'none';
+                return;
+            }
 
-    function checkAnswer() {
-        const userAnswer = answerInput.value.trim().toLowerCase();
-        const correctAnswer = questions[currentQuestionIndex].answer.trim().toLowerCase();
-        
-        if (userAnswer === correctAnswer) {
-            statusMessage.textContent = 'إجابة صحيحة! ✅';
-            statusMessage.style.color = '#4ade80'; 
-            correctAnswers++;
-        } else {
-            statusMessage.textContent = `إجابة خاطئة. الصحيح: ${questions[currentQuestionIndex].answer} ❌`;
-            statusMessage.style.color = '#f87171'; 
-        }
-
-        setTimeout(() => {
-            currentQuestionIndex++;
+            questions = JSON.parse(storedSet);
             loadQuestion();
-        }, 1500); 
-    }
+        }
 
-    loadQuestion();
-</script>
+        // 2. تحميل السؤال الحالي وعرضه مع الخيارات
+        function loadQuestion() {
+            statusMessage.style.display = 'none';
+            optionsContainer.innerHTML = '';
+            
+            if (currentQuestionIndex < questions.length) {
+                const currentQuestion = questions[currentQuestionIndex];
+                
+                questionElement.textContent = currentQuestion.question;
+                questionCounter.textContent = `السؤال ${currentQuestionIndex + 1} من ${questions.length}`;
+
+                // عرض الخيارات كأزرار (القراءة من حقل options)
+                const options = currentQuestion.options || ['خيار 1', 'خيار 2', 'خيار 3'];
+
+                options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.className = 'option-button';
+                    button.textContent = option;
+                    // عند الضغط على أي خيار، ينتقل للسؤال التالي
+                    button.onclick = () => selectOption(button, option, currentQuestion.id); 
+                    optionsContainer.appendChild(button);
+                });
+
+            } else {
+                // 💡 نهاية الاستبيان!
+                
+                // تسجيل إكمال الاستبيان (دالة markSurveyCompleted من surveys_handler.js)
+                markSurveyCompleted(SURVEY_TYPE); 
+
+                // منح النقاط (دالة grantPoints من firebase_init.js)
+                const REWARD_POINTS = getSurveyReward(SURVEY_TYPE); 
+                grantPoints(REWARD_POINTS); 
+                
+                questionElement.innerHTML = `
+                    <div class="text-center">
+                        <p class="text-xl font-bold text-green-600">تهانينا! 🎉</p>
+                        <p>أكملت استبيان الـ ${questions.length} أسئلة بنجاح.</p>
+                        <p>تم إضافة <span class="text-red-600 font-bold">${REWARD_POINTS}</span> نقاط إلى رصيدك.</p>
+                    </div>
+                `;
+                
+                optionsContainer.style.display = 'none';
+                questionCounter.style.display = 'none';
+                nextTaskButton.style.display = 'block';
+            }
+        }
+
+        // 3. معالجة اختيار الخيار والانتقال للسؤال التالي
+        function selectOption(selectedButton, optionValue, questionId) {
+            
+            // تعطيل جميع الخيارات بعد الاختيار
+            const allOptions = document.querySelectorAll('.option-button');
+            allOptions.forEach(button => button.classList.add('disabled'));
+            
+            selectedButton.classList.add('selected');
+
+            statusMessage.textContent = `تم تسجيل إجابتك. سيتم الانتقال للسؤال التالي...`;
+            statusMessage.className = 'info';
+            statusMessage.style.display = 'block';
+
+            // الانتقال للسؤال التالي بعد عرض رسالة التأكيد
+            setTimeout(() => {
+                currentQuestionIndex++;
+                loadQuestion(); 
+            }, 2000); 
+        }
+
+        function goToHome() {
+            window.location.href = 'index.html'; 
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeSurvey);
+    </script>
 
 </body>
 </html>
