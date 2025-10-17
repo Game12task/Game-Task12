@@ -1,141 +1,47 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مهام اليوم المتجددة</title>
-    <script src="tasks_handler.js"></script>
-    <style>
-        /* CSS الخاص بك بدون تغيير */
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7f6;
-            margin: 0;
-            padding: 20px;
-            text-align: right;
-        }
-        .header {
-            background-color: #3f51b5;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .task-item-card {
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: relative;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .task-item-card:hover:not(.completed) {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        .task-item-card h3 {
-            margin-top: 0;
-            color: #3f51b5;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-            font-size: 1.1em;
-        }
-        .task-item-card p {
-            font-size: 0.9em;
-            color: #555;
-            margin-bottom: 10px;
-        }
-        .status {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 0.8em;
-        }
-        .available {
-            background-color: #4CAF50; /* أخضر */
-            color: white;
-        }
-        .completed {
-            background-color: #f44336; /* أحمر لـ 'مكتمل' */
-            color: white;
-            opacity: 0.7; /* لتمييز المكتملة */
-            pointer-events: none; /* لمنع الضغط عليها */
-        }
-        #tasks-list-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="header">
-        <h1 id="page-title">قائمة مهام اليوم</h1>
-        <p id="page-subtitle">المهام متجددة يومياً. استكمل المهام المتاحة الآن!</p>
-    </div>
-
-    <div id="tasks-list-container">
-        <p style="text-align: center;">جاري تحميل مهام...</p>
-    </div>
-
     <script>
-        // دالة يتم استدعاؤها لعرض قائمة المهام
+        // دالة يتم استدعاؤها لعرض قائمة المهام (تحدي واحد لكل فئة)
         function renderTaskList(category) {
             const container = document.getElementById('tasks-list-container');
-            
-            // استدعاء دالة جلب المهام من tasks_handler.js
-            const dailyTasks = getCurrentDailyTasks(category);
-            
             container.innerHTML = ''; // مسح رسالة "جاري التحميل"
 
-            if (dailyTasks.length === 0) {
-                container.innerHTML = `<p style="color: #555; text-align: center;">لا توجد مهام متاحة حالياً في فئة ${category}.</p>`;
-                return;
-            }
+            // 1. تحديد ما إذا كان التحدي قد اكتمل اليوم (من tasks_handler.js)
+            const isChallengeCompleted = !isTaskAvailable(category); // isTaskAvailable تعني هل متاح للحل
 
-            dailyTasks.forEach(task => {
-                const isCompleted = isTaskCompleted(task.id);
-                const taskCard = document.createElement('div');
-                taskCard.className = `task-item-card ${isCompleted ? 'completed' : 'available'}`;
-                taskCard.onclick = isCompleted ? null : () => redirectToSolver(task);
-                
-                // تحديد النص والعنوان
-                taskCard.innerHTML = `
-                    <h3>${task.question}</h3>
-                    <p>المكافأة: ${task.reward} نقطة</p>
-                    <span class="status">${isCompleted ? 'مكتملة ✅' : 'متاحة'}</span>
-                `;
-                container.appendChild(taskCard);
-            });
+            const taskCard = document.createElement('div');
+            // نعرض تحدي واحد فقط لكل فئة
+            taskCard.className = `task-item-card ${isChallengeCompleted ? 'completed' : 'available'}`;
+            taskCard.onclick = isChallengeCompleted ? null : () => startChallenge(category);
+
+            // تحديد العنوان والنص
+            taskCard.innerHTML = `
+                <h3> تحدي ${category} اليومي (4 أسئلة)</h3>
+                <p>اختبر معلوماتك في ${category} واحصل على نقاط.</p>
+                <p>المكافأة الإجمالية: 40 نقطة (10 نقاط لكل سؤال)</p>
+                <span class="status">${isChallengeCompleted ? 'مكتملة ✅' : 'متاح للبدء'}</span>
+            `;
+            container.appendChild(taskCard);
         }
 
-        // دالة التوجيه لصفحة الحل (تحتاج إلى التأكد من أنها تتوافق مع صفحة الحل الخاصة بك)
-        function redirectToSolver(task) {
-            // نمرر ID المهمة ومكافأتها لصفحة الحل
-            const url = `dynamic_task_question_solver.html?taskId=${task.id}&reward=${task.reward}&answer=${encodeURIComponent(task.answer)}`;
-            window.location.href = url;
-        }
+        // دالة بدء التحدي
+        function startChallenge(category) {
+            // 💡 الخطوة الأهم: نحفظ الفئة في الذاكرة المحلية
+            localStorage.setItem('current_task_category', category);
 
+            // التوجيه إلى صفحة الحل التي تحتوي على الأسئلة المتتالية
+            window.location.href = 'dynamic_task_question_solver.html';
+        }
 
         // تشغيل المنطق عند تحميل الصفحة
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const category = urlParams.get('category'); // سيجلب القيمة مثل 'ديني' أو 'ثقافي'
-            
+
             if (category) {
                 // تحديث العنوان بناءً على الفئة العربية
-                document.getElementById('page-title').textContent = `مهام اليوم - ${category}`;
-                document.getElementById('page-subtitle').textContent = `استكمل المهام المتاحة الآن! (كل مهمة تُنجز تمنح نقطة واحدة)`;
-                
-                // عرض القائمة للفئة المحددة
+                document.getElementById('page-title').textContent = `تحديات اليوم - ${category}`;
+                document.getElementById('page-subtitle').textContent = `استكمل التحدي المتاح الآن!`;
+
+                // عرض التحدي الموحد للفئة المحددة
                 renderTaskList(category);
             } else {
                 document.getElementById('tasks-list-container').innerHTML = `<p style="color: red; text-align: center;">
@@ -146,6 +52,4 @@
             }
         });
     </script>
-
-</body>
-</html>
+    
