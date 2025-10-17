@@ -34,7 +34,7 @@ const DAILY_TASKS_DAY1 = [
         correctAnswer: 'أوروغواي',
         points: 5
     },
-    // المهمة 4: تاريخية (جديدة)
+    // المهمة 4: تاريخية
     {
         ID: 'T1-H04',
         category: 'Historical',
@@ -43,7 +43,7 @@ const DAILY_TASKS_DAY1 = [
         correctAnswer: '1989',
         points: 5
     },
-     // المهمة 5: علمية/تقنية (جديدة)
+     // المهمة 5: علمية/تقنية
     {
         ID: 'T1-Sc05',
         category: 'Scientific/Technological',
@@ -83,7 +83,7 @@ const DAILY_TASKS_DAY2 = [
         correctAnswer: '5',
         points: 5
     },
-    // المهمة 4: تاريخية (جديدة)
+    // المهمة 4: تاريخية
     {
         ID: 'T2-H04',
         category: 'Historical',
@@ -92,7 +92,7 @@ const DAILY_TASKS_DAY2 = [
         correctAnswer: 'القسطنطينية',
         points: 5
     },
-     // المهمة 5: علمية/تقنية (جديدة)
+     // المهمة 5: علمية/تقنية
     {
         ID: 'T2-Sc05',
         category: 'Scientific/Technological',
@@ -105,7 +105,7 @@ const DAILY_TASKS_DAY2 = [
 
 
 // -----------------------------------------------------
-// 2. دالة جلب المهام لليوم الحالي
+// 2. دالة جلب المهام لليوم الحالي (منطق التدوير)
 // -----------------------------------------------------
 function getCurrentDailyTasks() {
     const today = new Date();
@@ -123,7 +123,7 @@ function isTaskAvailable(taskId) {
     const userId = localStorage.getItem('user_id');
     if (!userId) return false; 
     
-    // المفتاح للتخزين: task_completed_USERID_TASKID_TODAYSDATE
+    // المفتاح للتخزين: task_completed_USERID_TASKID
     const completionKey = `task_completed_${userId}_${taskId}`;
     const lastCompletionDate = localStorage.getItem(completionKey);
     
