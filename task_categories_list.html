@@ -10,7 +10,8 @@
     body{margin:0;background:linear-gradient(180deg,#071127 0%, #071a2a 100%);color:#e6eef6;padding:20px;min-height:100vh;}
     .container{max-width:600px;margin:40px auto;padding:20px;background:var(--card);border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,0.2);}
     h1{text-align:center;color:var(--accent);margin-bottom:30px;}
-    .list-group a{display:block;background:#1e293b;color:#e6eef6;padding:15px;margin-bottom:15px;border-radius:8px;text-decoration:none;font-size:18px;font-weight:600;transition:background 0.3s, transform 0.2s;}
+    /* تم إضافة مؤشر اليد هنا */
+    .list-group a{display:block;background:#1e293b;color:#e6eef6;padding:15px;margin-bottom:15px;border-radius:8px;text-decoration:none;font-size:18px;font-weight:600;transition:background 0.3s, transform 0.2s; cursor: pointer;} 
     .list-group a:hover{background:#334155;transform:scale(1.02);}
     .back-link{display:block;text-align:center;margin-top:25px;color:var(--muted);text-decoration:none;}
 </style>
@@ -19,11 +20,22 @@
 <div class="container">
     <h1>اختر فئة المهام</h1>
     <div class="list-group">
-        <a href="dynamic_task_list.html?category=ديني">مهام دينية</a>
-        <a href="dynamic_task_list.html?category=ثقافي">مهام ثقافية</a>
-        <a href="dynamic_task_list.html?category=رياضي">مهام رياضية</a>
+        <a href="#" onclick="selectTaskCategory('Religious')">مهام دينية</a>
+        <a href="#" onclick="selectTaskCategory('Cultural')">مهام ثقافية</a>
+        <a href="#" onclick="selectTaskCategory('Sports')">مهام رياضية</a>
     </div>
-    <a href="index.html" class="back-link">العودة للصفحة الرئيسية</a>
+    <a href="offers.html" class="back-link">العودة لصفحة العروض</a>
 </div>
+
+<script>
+    function selectTaskCategory(category) {
+        // 1. تخزين اسم الفئة (باللغة الإنجليزية لسهولة البرمجة في JS)
+        localStorage.setItem('current_task_category', category);
+        
+        // 2. الانتقال إلى صفحة عرض الأسئلة التي أنشأناها (task_questions_day1.html)
+        window.location.href = 'tasks_questions_day1.html';
+    }
+</script>
+
 </body>
 </html>
