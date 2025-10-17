@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حل التحدي</title>
+    <title>حل تحدي المهام اليومية</title>
     <script src="tasks_handler.js"></script>
+    <script src="firebase_init.js"></script>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -37,44 +38,36 @@
             font-weight: bold;
             color: #1976d2;
         }
-        .option-button {
-            display: block;
+        #answer-input {
             width: 100%;
             padding: 15px;
             margin-bottom: 10px;
-            background-color: #fff;
-            color: #333;
-            border: 1px solid #ddd;
+            border: 1px solid #ccc;
             border-radius: 6px;
-            cursor: pointer;
-            text-align: right;
-            transition: background-color 0.3s, border-color 0.3s;
+            box-sizing: border-box;
             font-size: 1em;
         }
-        .option-button:hover:not(.disabled) {
-            background-color: #f0f0f0;
-        }
-        .option-button.correct {
+        #submit-button {
+            width: 100%;
+            padding: 15px;
             background-color: #4CAF50; /* أخضر */
             color: white;
-            border-color: #4CAF50;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s;
         }
-        .option-button.incorrect {
-            background-color: #f44336; /* أحمر */
-            color: white;
-            border-color: #f44336;
+        #submit-button:hover {
+            background-color: #45a049;
         }
-        .disabled {
-            pointer-events: none;
-            opacity: 0.7;
-        }
-        #result-message {
-            margin-top: 20px;
-            padding: 15px;
+        #status-message {
+            margin-top: 15px;
+            padding: 10px;
             border-radius: 6px;
             font-weight: bold;
             text-align: center;
-            display: none; /* إخفاء في البداية */
+            display: none;
         }
         .success {
             background-color: #c8e6c9;
@@ -84,7 +77,7 @@
             background-color: #ffcdd2;
             color: #d32f2f;
         }
-        #next-button {
+        #next-task-button {
             display: none;
             width: 100%;
             padding: 15px;
@@ -96,145 +89,142 @@
             cursor: pointer;
             font-size: 1.1em;
         }
+        #question-counter {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #666;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>تحدي اليوم</h1>
+        <h1>تحدي المهام اليومية</h1>
         
-        <div id="question-box">جاري تحميل السؤال...</div>
+        <div id="question-counter"></div>
         
-        <div id="options-container">
-            </div>
+        <div id="question-box">جاري تحميل الأسئلة...</div>
+        
+        <input type="text" id="answer-input" placeholder="اكتب إجابتك هنا">
+        
+        <button id="submit-button" onclick="checkAnswer()">تأكيد الإجابة</button>
 
-        <div id="result-message"></div>
+        <div id="status-message"></div>
         
-        <button id="next-button" onclick="goToTaskList()">العودة إلى قائمة المهام</button>
+        <button id="next-task-button" onclick="goToTaskList()">العودة إلى قائمة المهام</button>
     </div>
 
     <script>
-        let currentTask = null;
+        let CATEGORY_ID = null;
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let correctAnswers = 0;
         
-        // جلب السؤال بناءً على الـ ID من الرابط
-        function fetchTask() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const taskId = urlParams.get('task_id');
-            
-            if (!taskId) {
-                document.getElementById('question-box').innerHTML = "خطأ: لم يتم تحديد التحدي.";
+        const questionElement = document.getElementById('question-box');
+        const answerInput = document.getElementById('answer-input');
+        const submitButton = document.getElementById('submit-button');
+        const statusMessage = document.getElementById('status-message');
+        const questionCounter = document.getElementById('question-counter');
+        const nextTaskButton = document.getElementById('next-task-button');
+        
+        // 1. بدء العملية وتحميل الأسئلة
+        function initializeTasks() {
+            // جلب الفئة التي تم اختيارها من الصفحة السابقة (مثلاً 'culture')
+            CATEGORY_ID = localStorage.getItem('current_task_category'); 
+
+            // التأكد من توفر المهام (لم يحلها المستخدم اليوم)
+            if (!CATEGORY_ID || !isTaskAvailable(CATEGORY_ID)) {
+                questionElement.innerHTML = "لقد أكملت مهام هذه الفئة اليوم أو حدث خطأ في التحميل. يرجى العودة لصفحة البداية.";
+                nextTaskButton.style.display = 'block';
+                submitButton.style.display = 'none';
+                answerInput.style.display = 'none';
                 return;
             }
 
-            // البحث عن السؤال في ALL_TASKS_POOL (المصفوفة في tasks_handler.js)
-            const taskData = ALL_TASKS_POOL.find(task => task[0] === taskId);
-
-            if (!taskData) {
-                document.getElementById('question-box').innerHTML = "خطأ: لم يتم العثور على السؤال.";
-                return;
-            }
-
-            // تحويل بيانات المصفوفة إلى كائن يسهل التعامل معه
-            currentTask = {
-                id: taskData[0],
-                category: taskData[1],
-                question: taskData[2],
-                options: [taskData[3], taskData[4], taskData[5]],
-                answer: taskData[6]
-            };
-            
-            // تحقق من أن المهمة لم تكتمل بالفعل
-            if (isTaskCompleted(currentTask.id)) {
-                 document.getElementById('question-box').innerHTML = `✅ ${currentTask.question}`;
-                 document.getElementById('result-message').textContent = 'لقد أكملت هذا التحدي بالفعل!';
-                 document.getElementById('result-message').className = 'success';
-                 document.getElementById('result-message').style.display = 'block';
-                 document.getElementById('next-button').style.display = 'block';
-                 // إظهار الخيار الصحيح فقط لغير القابلية للتفاعل
-                 renderOptions(true, currentTask.answer); 
-                 return;
-            }
-
-            renderOptions();
+            // جلب مجموعة الأسئلة اليومية من tasks_handler.js
+            questions = getCurrentDailyTasks(CATEGORY_ID); 
+            loadQuestion();
         }
 
-        // عرض السؤال والخيارات
-        function renderOptions(isDisabled = false, correctOption = null) {
-            document.getElementById('question-box').textContent = currentTask.question;
-            const optionsContainer = document.getElementById('options-container');
-            optionsContainer.innerHTML = '';
+        // 2. تحميل السؤال الحالي وعرضه
+        function loadQuestion() {
+            // إعادة ضبط الحالة للعرض الجديد
+            answerInput.value = '';
+            statusMessage.style.display = 'none';
+            submitButton.disabled = false;
+            submitButton.style.backgroundColor = '#4CAF50';
+            submitButton.textContent = 'تأكيد الإجابة';
             
-            // خلط الخيارات عشوائياً لتحسين التجربة
-            const shuffledOptions = shuffleArray(currentTask.options);
-            
-            shuffledOptions.forEach(option => {
-                const button = document.createElement('button');
-                button.className = 'option-button' + (isDisabled ? ' disabled' : '');
-                button.textContent = option;
-                button.onclick = () => checkAnswer(option, button);
+            if (currentQuestionIndex < questions.length) {
+                // عرض السؤال الحالي
+                questionElement.textContent = questions[currentQuestionIndex].question;
+                questionCounter.textContent = `السؤال ${currentQuestionIndex + 1} من ${questions.length}`;
+            } else {
+                // 💡 نهاية المهام (العداد وصل إلى 5)
                 
-                // إذا كانت المهمة مكتملة، نظهر الخيار الصحيح بلون أخضر
-                if (isDisabled && option === correctOption) {
-                    button.classList.add('correct');
-                }
-
-                optionsContainer.appendChild(button);
-            });
-        }
-        
-        // دالة خلط المصفوفة (لجعل الخيارات عشوائية)
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
+                // تسجيل إكمال المهمة في tasks_handler.js
+                markTaskCompleted(CATEGORY_ID); 
+                
+                // منح النقاط (الدالة موجودة في firebase_init.js)
+                const REWARD_POINTS = getTaskReward(CATEGORY_ID); 
+                grantPoints(REWARD_POINTS); 
+                
+                questionElement.innerHTML = `
+                    <div class="text-center">
+                        <p class="text-xl font-bold text-green-600">تهانينا! 🎉</p>
+                        <p>أكملت جميع أسئلة المهام اليومية بنجاح.</p>
+                        <p>الإجابات الصحيحة: <span class="text-blue-600">${correctAnswers}</span> من <span class="text-blue-600">${questions.length}</span></p>
+                        <p>تم إضافة <span class="text-red-600 font-bold">${REWARD_POINTS}</span> نقاط إلى رصيدك.</p>
+                    </div>
+                `;
+                
+                // إخفاء حقول الإجابة وإظهار زر العودة
+                submitButton.style.display = 'none';
+                answerInput.style.display = 'none';
+                questionCounter.style.display = 'none';
+                nextTaskButton.style.display = 'block';
             }
-            return array;
         }
 
-        // التحقق من الإجابة
-        function checkAnswer(selectedAnswer, selectedButton) {
-            const resultMessage = document.getElementById('result-message');
-            const options = document.querySelectorAll('.option-button');
+        // 3. التحقق من الإجابة والانتقال للسؤال التالي
+        function checkAnswer() {
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            // الحصول على الإجابة الصحيحة من قائمة الأسئلة اليومية
+            const correctAnswer = questions[currentQuestionIndex].answer.trim().toLowerCase(); 
             
-            // تعطيل جميع الأزرار بعد الإجابة
-            options.forEach(button => button.classList.add('disabled'));
+            // تعطيل زر التأكيد لمنع الإجابة المزدوجة
+            submitButton.disabled = true;
 
-            if (selectedAnswer === currentTask.answer) {
+            if (userAnswer === correctAnswer) {
                 // إجابة صحيحة
-                selectedButton.classList.add('correct');
-                resultMessage.textContent = '🥳 إجابة صحيحة! تم إضافة النقاط إلى رصيدك.';
-                resultMessage.className = 'success';
-                recordTaskCompletion(currentTask.id); // تسجيل الإنجاز في tasks_handler.js
-                
+                statusMessage.textContent = 'إجابة صحيحة! ✅ سيتم الانتقال للسؤال التالي...';
+                statusMessage.className = 'success';
+                statusMessage.style.display = 'block';
+                correctAnswers++;
             } else {
                 // إجابة خاطئة
-                selectedButton.classList.add('incorrect');
-                resultMessage.textContent = `❌ إجابة خاطئة. الإجابة الصحيحة هي: ${currentTask.answer}`;
-                resultMessage.className = 'fail';
-
-                // إظهار الإجابة الصحيحة
-                options.forEach(button => {
-                    if (button.textContent === currentTask.answer) {
-                        button.classList.add('correct');
-                    }
-                });
+                statusMessage.textContent = `❌ إجابة خاطئة. الصحيح: ${questions[currentQuestionIndex].answer}`;
+                statusMessage.className = 'fail';
+                statusMessage.style.display = 'block';
             }
-            
-            resultMessage.style.display = 'block';
-            document.getElementById('next-button').style.display = 'block';
+
+            // الانتظار ثم الانتقال للسؤال التالي
+            // هذه الخطوة تزيد العداد وتستدعي loadQuestion() لعرض السؤال الجديد
+            setTimeout(() => {
+                currentQuestionIndex++;
+                loadQuestion(); 
+            }, 2500); // 2.5 ثانية لعرض الرسالة
         }
 
+        // 4. دالة العودة لقائمة المهام
         function goToTaskList() {
-            // يعود إلى صفحة قائمة المهام للفئة الحالية
-            let category = '';
-            if (currentTask.category === 'ديني') category = 'religious';
-            else if (currentTask.category === 'رياضي') category = 'sports';
-            else if (currentTask.category === 'ثقافي') category = 'culture';
-            
-            window.location.href = `dynamic_task_list.html?category=${category}`;
+            // العودة لقائمة الفئات ليتمكن من اختيار فئة أخرى
+            window.location.href = 'task_categories.html'; 
         }
 
-        document.addEventListener('DOMContentLoaded', fetchTask);
+        // بدء تشغيل المهام عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', initializeTasks);
     </script>
 
 </body>
