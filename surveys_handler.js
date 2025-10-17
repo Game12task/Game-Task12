@@ -1,85 +1,83 @@
-// surveys_handler.js - ملف لمعالجة وتدوير أسئلة الاستبيانات (مُعَدَّل ونهائي)
+// surveys_handler.js - ملف لمعالجة وتدوير أسئلة الاستبيانات (مُعَدَّل إلى نظام الخيارات المتعددة)
 
 // -----------------------------------------------------
 // 1. قاعدة بيانات الأسئلة (استبيان 5 أسئلة - Q5)
+// **ملاحظة:** تم استبدال 'answer' بـ 'options'.
 // -----------------------------------------------------
 const SURVEY_Q5_DAY1 = [
-    { ID: 'S5-A01', category: 'General', question: 'ما هو الشيء الذي يزيد وزنه كلما أخذت منه؟', answer: 'الحفرة' },
-    { ID: 'S5-A02', category: 'General', question: 'أي مدينة تُعرف باسم "مدينة الضباب"؟', answer: 'لندن' },
-    { ID: 'S5-A03', category: 'General', question: 'كم عدد حبات القمح في الكيلوغرام الواحد؟', answer: 'لا يمكن معرفته' },
-    { ID: 'S5-A04', category: 'General', question: 'من هو أول رائد فضاء عربي؟', answer: 'الأمير سلطان بن سلمان' },
-    { ID: 'S5-A05', category: 'General', question: 'كم كوكب في المجموعة الشمسية (بدون بلوتو)؟', answer: '8' },
+    { ID: 'S5-A01', category: 'Opinion', question: 'ما هو مدى رضاك العام عن محتوى الموقع؟', options: ['راضٍ جداً', 'راضٍ', 'محايد', 'غير راضٍ'] },
+    { ID: 'S5-A02', category: 'Experience', question: 'ما هو الشيء الذي تراه الأكثر أهمية في الموقع؟', options: ['سرعة التحميل', 'تنوع الأسئلة', 'تصميم الواجهة'] },
+    { ID: 'S5-A03', category: 'Interest', question: 'ما هي الفئة التي ترغب بزيادة الأسئلة فيها مستقبلاً؟', options: ['ثقافة عامة', 'رياضة', 'تاريخ', 'ديني'] },
+    { ID: 'S5-A04', category: 'Design', question: 'هل تجد أن الألوان المستخدمة مريحة للعين؟', options: ['نعم، مريحة', 'مقبولة', 'لا، مزعجة'] },
+    { ID: 'S5-A05', category: 'Engagement', question: 'كم مرة تقريباً تزور فيها الموقع في الأسبوع؟', options: ['مرة واحدة', '2-3 مرات', 'أكثر من 3 مرات'] },
 ];
 
 const SURVEY_Q5_DAY2 = [
-    { ID: 'S5-B01', category: 'General', question: 'أين يقع أكبر محيط في العالم؟', answer: 'المحيط الهادئ' },
-    { ID: 'S5-B02', category: 'General', question: 'من هو مؤلف رواية "ألف ليلة وليلة"؟', answer: 'لا يوجد مؤلف واحد' },
-    { ID: 'S5-B03', category: 'General', question: 'ما هو الشيء الذي يمشي ويقف وليس له أرجل؟', answer: 'الساعة' },
-    { ID: 'S5-B04', category: 'General', question: 'ما هي الدولة التي لديها أطول خط ساحلي في العالم؟', answer: 'كندا' },
-    { ID: 'S5-B05', category: 'General', question: 'ما هو العنصر الكيميائي الذي رمزه K؟', answer: 'البوتاسيوم' },
+    { ID: 'S5-B01', category: 'Opinion', question: 'هل تواجه أي صعوبة في التنقل بين صفحات الموقع؟', options: ['لا توجد صعوبة', 'صعوبة بسيطة', 'صعوبة كبيرة'] },
+    { ID: 'S5-B02', category: 'Experience', question: 'هل تفضل الأسئلة النصية أم الأسئلة المصورة (إذا توفرت)؟', options: ['النصية', 'المصورة', 'كلاهما'] },
+    { ID: 'S5-B03', category: 'Interest', question: 'ما هي الميزة الجديدة التي تتمنى إضافتها؟', options: ['دردشة مباشرة', 'نظام إشعارات', 'ترتيب عالمي'] },
+    { ID: 'S5-B04', category: 'Design', question: 'ما مدى سهولة استخدام واجهة حل الاستبيانات؟', options: ['سهل جداً', 'سهل', 'صعب نوعاً ما'] },
+    { ID: 'S5-B05', category: 'Engagement', question: 'هل تشارك النقاط التي تحصل عليها مع أصدقائك؟', options: ['أشارك دائماً', 'أحياناً', 'لا أشارك'] },
 ];
 
 // -----------------------------------------------------
 // 2. قاعدة بيانات الأسئلة (استبيان 7 أسئلة - Q7)
 // -----------------------------------------------------
 const SURVEY_Q7_DAY1 = [
-    { ID: 'S7-A01', category: 'History', question: 'من هو مكتشف قانون الجاذبية؟', answer: 'إسحاق نيوتن' },
-    { ID: 'S7-A02', category: 'History', question: 'ما هي أقدم عاصمة مأهولة في العالم؟', answer: 'دمشق' },
-    { ID: 'S7-A03', category: 'Science', question: 'كم يوماً في السنة الكبيسة؟', answer: '366' },
-    { ID: 'S7-A04', category: 'Geography', question: 'ما هو البحر الذي يفصل بين أوروبا وأفريقيا؟', answer: 'البحر الأبيض المتوسط' },
-    { ID: 'S7-A05', category: 'Literature', question: 'ما هي القارة التي ليس بها زواحف سامة؟', answer: 'أنتاركتيكا' },
-    { ID: 'S7-A06', category: 'Sport', question: 'ما هو الشيء الذي تراه ولا يراك؟', answer: 'الظل' },
-    { ID: 'S7-A07', category: 'Sport', question: 'كم نقطة تُمنح للفريق الفائز في كرة القدم؟', answer: '3' },
+    { ID: 'S7-A01', category: 'Opinion', question: 'ما هي أهمية نظام جمع النقاط بالنسبة لك؟', options: ['مهم جداً', 'مهم', 'ليس مهماً جداً'] },
+    { ID: 'S7-A02', category: 'Experience', question: 'هل تجد أن نظام التدوير اليومي للأسئلة مناسب؟', options: ['نعم، مناسب جداً', 'أفضل أن يكون أسبوعياً', 'أفضل أن يكون يومياً بشكل أوسع'] },
+    { ID: 'S7-A03', category: 'Science', question: 'ما مدى دقة الأسئلة التي يتم طرحها في فئة العلوم؟', options: ['دقيقة جداً', 'جيدة', 'تحتاج لمراجعة'] },
+    { ID: 'S7-A04', category: 'Geography', question: 'ما هو الجهاز الذي تستخدمه للوصول للموقع غالباً؟', options: ['هاتف محمول', 'حاسوب لوحي', 'حاسوب مكتبي'] },
+    { ID: 'S7-A05', category: 'Literature', question: 'ما هو أفضل وقت لإطلاق تحديثات وميزات جديدة؟', options: ['عطلة نهاية الأسبوع', 'منتصف الأسبوع', 'لا فرق'] },
+    { ID: 'S7-A06', category: 'Sport', question: 'هل تفضل الإجابة على الأسئلة في وضع الليل (Dark Mode)؟', options: ['أفضله دائماً', 'أستخدم الوضع العادي', 'لا يهم'] },
+    { ID: 'S7-A07', category: 'Sport', question: 'كم سؤال تجده مناسباً في الاستبيان الواحد (بشكل عام)؟', options: ['5', '7', '10', 'أكثر'] },
 ];
 
 const SURVEY_Q7_DAY2 = [
-    { ID: 'S7-B01', category: 'History', question: 'من هو أول من طاف حول الكرة الأرضية؟', answer: 'ماجلان' },
-    { ID: 'S7-B02', category: 'Science', question: 'ما هو أسرع حيوان بري على وجه الأرض؟', answer: 'الفهد' },
-    { ID: 'S7-B03', category: 'Science', question: 'ما هي عاصمة أستراليا؟', answer: 'كانبيرا' },
-    { ID: 'S7-B04', category: 'Geography', question: 'ما هو الشيء الذي كلما زاد نقص؟', answer: 'العمر' },
-    { ID: 'S7-B05', category: 'Literature', question: 'أين يقع برج بيزا المائل؟', answer: 'إيطاليا' },
-    { ID: 'S7-B06', category: 'Sport', question: 'ما هي الرياضة التي تُعرف بـ "ملكة الرياضات"؟', answer: 'ألعاب القوى' },
-    { ID: 'S7-B07', category: 'Sport', question: 'ما هو أكبر عضو في جسم الإنسان؟', answer: 'الجلد' },
+    { ID: 'S7-B01', category: 'History', question: 'هل تفضل وجود خيار لـ "تخطي السؤال" في المهام؟', options: ['نعم', 'لا'] },
+    { ID: 'S7-B02', category: 'Science', question: 'ما مدى وضوح الخط في الموقع وسهولة قراءته؟', options: ['واضح جداً', 'جيد', 'صعب القراءة'] },
+    { ID: 'S7-B03', category: 'Science', question: 'هل تفضل إظهار الإجابة الصحيحة بعد الإجابة (حتى لو لم نعتمدها في هذا الاستبيان)؟', options: ['نعم', 'لا', 'لا فرق'] },
+    { ID: 'S7-B04', category: 'Geography', question: 'هل تقوم بحل جميع الاستبيانات (5، 7، 10) كل يوم؟', options: ['نعم، كلها', 'أحل البعض فقط', 'أحل واحداً فقط'] },
+    { ID: 'S7-B05', category: 'Literature', question: 'كم الوقت تقريباً تقضيه في حل تحديات الموقع يومياً؟', options: ['أقل من 5 دقائق', '5-10 دقائق', 'أكثر من 10 دقائق'] },
+    { ID: 'S7-B06', category: 'Sport', question: 'هل تفضل مشاركة الإنجازات على وسائل التواصل الاجتماعي؟', options: ['أفعلها دائماً', 'أحياناً', 'لا أفعلها'] },
+    { ID: 'S7-B07', category: 'Sport', question: 'هل هناك أي فئة أسئلة يجب حذفها نهائياً؟', options: ['لا، جميعها جيدة', 'فئة واحدة محددة', 'أكثر من فئة'] },
 ];
 
 // -----------------------------------------------------
 // 3. قاعدة بيانات الأسئلة (استبيان 10 أسئلة - Q10)
 // -----------------------------------------------------
 const SURVEY_Q10_DAY1 = [
-    { ID: 'S10-A01', category: 'Math', question: 'ما هي النسبة المئوية لـ 0.5؟', answer: '50%' },
-    { ID: 'S10-A02', category: 'History', question: 'في أي عام سقط جدار برلين؟', answer: '1989' },
-    { ID: 'S10-A03', category: 'Science', question: 'ما هو الكوكب الأقرب إلى الشمس؟', answer: 'عطارد' },
-    { ID: 'S10-A04', category: 'Geography', question: 'ما هي أصغر دولة في العالم من حيث المساحة؟', answer: 'الفاتيكان' },
-    { ID: 'S10-A05', category: 'Literature', question: 'من كتب مسرحية "روميو وجولييت"؟', answer: 'شكسبير' },
-    { ID: 'S10-A06', category: 'Sport', question: 'كم عدد اللاعبين في فريق كرة السلة؟', answer: '5' },
-    { ID: 'S10-A07', category: 'Religion', question: 'ما هي أطول سورة في القرآن الكريم؟', answer: 'البقرة' },
-    { ID: 'S10-A08', category: 'General', question: 'ما هو الطائر الذي لا يطير؟', answer: 'النعامة' },
-    { ID: 'S10-A09', category: 'General', question: 'ما هو الشيء الذي له أسنان ولا يأكل؟', answer: 'المشط' },
-    { ID: 'S10-A10', category: 'Math', question: 'كم ضلعًا للمثلث؟', answer: '3' },
+    { ID: 'S10-A01', category: 'Math', question: 'هل تعتبر أسئلة الرياضيات (إن وجدت) صعبة جداً؟', options: ['نعم', 'لا'] },
+    { ID: 'S10-A02', category: 'History', question: 'ما هو مستوى تعقيد أسئلة التاريخ الذي تفضله؟', options: ['سهل', 'متوسط', 'صعب'] },
+    { ID: 'S10-A03', category: 'Science', question: 'هل نظام النقاط الحالي محفز بالنسبة لك؟', options: ['محفز جداً', 'محفز نوعاً ما', 'غير محفز'] },
+    { ID: 'S10-A04', category: 'Geography', question: 'هل تفضل أن تكون المكافآت مادية (جوائز) بدلاً من النقاط؟', options: ['نعم', 'لا'] },
+    { ID: 'S10-A05', category: 'Literature', question: 'هل تجد أن حجم الخط المستخدم في الموقع مناسب؟', options: ['مناسب', 'أفضل أن يكون أكبر', 'أفضل أن يكون أصغر'] },
+    { ID: 'S10-A06', category: 'Sport', question: 'هل تفضل أسئلة الرياضات المحلية أو العالمية؟', options: ['المحلية', 'العالمية', 'كلاهما'] },
+    { ID: 'S10-A07', category: 'Religion', question: 'ما مدى أهمية فئة الأسئلة الدينية بالنسبة لك؟', options: ['مهمة جداً', 'مهمة', 'ليست مهمة جداً'] },
+    { ID: 'S10-A08', category: 'General', question: 'هل تفضل الإجابة باستخدام لوحة المفاتيح أو اللمس (Mobile)?', options: ['لوحة المفاتيح', 'اللمس', 'لا فرق'] },
+    { ID: 'S10-A09', category: 'General', question: 'هل تفضل وجود مؤثرات صوتية عند الإجابة على سؤال؟', options: ['نعم', 'لا'] },
+    { ID: 'S10-A10', category: 'Math', question: 'ما مدى احتمالية أن توصي بالموقع لصديق؟', options: ['محتمل جداً', 'محتمل', 'غير محتمل'] },
 ];
 
 const SURVEY_Q10_DAY2 = [
-    { ID: 'S10-B01', category: 'Math', question: 'ما هو ناتج (5+5) * 2؟', answer: '20' },
-    { ID: 'S10-B02', category: 'History', question: 'متى بدأت الحرب العالمية الثانية؟', answer: '1939' },
-    { ID: 'S10-B03', category: 'Science', question: 'ما هو الغاز الذي يشكل معظم الغلاف الجوي للأرض؟', answer: 'النيتروجين' },
-    { ID: 'S10-B04', category: 'Geography', question: 'ما هي أكبر صحراء حارة في العالم؟', answer: 'الصحراء الكبرى' },
-    { ID: 'S10-B05', category: 'Literature', question: 'ما هو لقب الكاتب الروسي ليو تولستوي؟', answer: 'الكونت' },
-    { ID: 'S10-B06', category: 'Sport', question: 'ما هي الدولة الأكثر فوزاً بكأس العالم لكرة القدم؟', answer: 'البرازيل' },
-    { ID: 'S10-B07', category: 'Religion', question: 'من هو خامس الخلفاء الراشدين؟', answer: 'عمر بن عبد العزيز' },
-    { ID: 'S10-B08', category: 'General', question: 'ما هو المخلوق الذي لديه 3 قلوب؟', answer: 'الأخطبوط' },
-    { ID: 'S10-B09', category: 'General', question: 'ما هو الشيء الذي يبتل عند التجفيف؟', answer: 'المنشفة' },
-    { ID: 'S10-B10', category: 'Math', question: 'ما هو أصغر عدد أولي؟', answer: '2' },
+    { ID: 'S10-B01', category: 'Math', question: 'هل تميل إلى الغش في الإجابة على الأسئلة؟', options: ['أغش دائماً', 'أغش أحياناً', 'لا أغش أبداً'] },
+    { ID: 'S10-B02', category: 'History', question: 'ما هو انطباعك عن تصميم الأزرار والروابط في الموقع؟', options: ['ممتاز', 'جيد', 'ضعيف'] },
+    { ID: 'S10-B03', category: 'Science', question: 'ما مدى دقة الإحصائيات (مثل عدد النقاط المكتسبة) التي تراها؟', options: ['دقيقة جداً', 'جيدة', 'غير دقيقة'] },
+    { ID: 'S10-B04', category: 'Geography', question: 'هل تفضل تحديات زمنية (وقت محدد للإجابة)؟', options: ['نعم', 'لا'] },
+    { ID: 'S10-B05', category: 'Literature', question: 'هل تشجعك التحديات اليومية على زيارة الموقع يومياً؟', options: ['نعم', 'لا'] },
+    { ID: 'S10-B06', category: 'Sport', question: 'ما هي أهمية وجود صور وشعارات في أسئلة الرياضة؟', options: ['مهم جداً', 'مهم', 'ليس مهماً'] },
+    { ID: 'S10-B07', category: 'Religion', question: 'هل تفضل أن تكون أسئلة الدين من القرآن والسنة فقط؟', options: ['نفضل ذلك', 'نريد تنويعاً', 'لا فرق'] },
+    { ID: 'S10-B08', category: 'General', question: 'هل تفضل استخدام التطبيق على الهاتف بدلاً من المتصفح (إذا توفر)؟', options: ['نعم', 'لا'] },
+    { ID: 'S10-B09', category: 'General', question: 'هل لديك أي اقتراحات إضافية لتحسين الموقع؟', options: ['نعم، لدي الكثير', 'لدي اقتراح واحد', 'ليس لدي'] },
+    { ID: 'S10-B10', category: 'Math', question: 'هل مستوى الجوائز الممنوحة (افتراضياً) مرضي؟', options: ['مرضي جداً', 'مرضي', 'غير مرضي'] },
 ];
 
 // -----------------------------------------------------
-// 4. دالة تحديد مجموعة أسئلة اليوم (المنطق)
+// 4. دالة تحديد مجموعة أسئلة اليوم (المنطق) - بدون تغيير
 // -----------------------------------------------------
 function getCurrentSurveySet(surveyType) {
     const today = new Date();
-    // نستخدم دورة الأيام لتحديد مفتاح التدوير (Day1 أو Day2)
-    const dayOfWeek = today.getDay(); // الأحد 0، الإثنين 1، ...، السبت 6
-
-    // نعتمد نفس منطق المهام: الأيام الفردية Day1 والأيام الزوجية Day2
+    const dayOfWeek = today.getDay(); 
     const isDayOne = (dayOfWeek === 0 || dayOfWeek === 2 || dayOfWeek === 4); 
 
     if (surveyType === 'Q5') {
@@ -98,7 +96,7 @@ function getCurrentSurveySet(surveyType) {
 }
 
 // -----------------------------------------------------
-// 5. دالة جلب مكافأة الاستبيان
+// 5. دالة جلب مكافأة الاستبيان - بدون تغيير
 // -----------------------------------------------------
 function getSurveyReward(surveyType) {
     switch(surveyType) {
@@ -110,7 +108,7 @@ function getSurveyReward(surveyType) {
 }
 
 // -----------------------------------------------------
-// 6. دالة التحقق من التجديد اليومي (تستخدم في صفحات الـ start)
+// 6. دالة التحقق من التجديد اليومي - بدون تغيير
 // -----------------------------------------------------
 function isSurveyAvailable(surveyType) {
     const userId = localStorage.getItem('user_id');
@@ -119,15 +117,13 @@ function isSurveyAvailable(surveyType) {
     const lastCompletionKey = `survey_completed_${userId}_${surveyType}`;
     const lastCompletionDate = localStorage.getItem(lastCompletionKey);
     
-    // الحصول على تاريخ اليوم فقط (بدون الوقت)
     const today = new Date().toDateString(); 
     
-    // إذا لم يكملها سابقاً أو كانت آخر مرة ليست اليوم
     return lastCompletionDate !== today;
 }
 
 // -----------------------------------------------------
-// 7. دالة تسجيل الإنجاز (تستخدم في صفحات الحل)
+// 7. دالة تسجيل الإنجاز - بدون تغيير
 // -----------------------------------------------------
 function markSurveyCompleted(surveyType) {
     const userId = localStorage.getItem('user_id');
@@ -136,7 +132,4 @@ function markSurveyCompleted(surveyType) {
     const lastCompletionKey = `survey_completed_${userId}_${surveyType}`;
     const today = new Date().toDateString();
     localStorage.setItem(lastCompletionKey, today);
-    
-    // ملاحظة: دالة منح النقاط (grantPoints) يجب أن تكون موجودة في مكان يمكن الوصول إليه (مثل index.html أو utils.js)
-    // عند استدعاء هذه الدالة في صفحة الحل، يجب أن تتبعها باستدعاء grantPoints(getSurveyReward(surveyType));
-}
+     }
