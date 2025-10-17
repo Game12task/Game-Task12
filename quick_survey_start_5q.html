@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>بدء استبيان 5 أسئلة</title>
+    <script src="firebase_init.js"></script> 
     <script src="surveys_handler.js"></script>
     <style>
         body {
@@ -73,7 +74,12 @@
         const backButton = document.getElementById('back-btn');
 
         // 1. التحقق من التوفر عند تحميل الصفحة
-        if (!isSurveyAvailable(SURVEY_TYPE)) {
+        // نستخدم isSurveyAvailable لتقرر ما إذا كان الاستبيان متاحًا اليوم أم لا.
+        if (typeof isSurveyAvailable !== 'function') {
+            statusMessage.textContent = "خطأ تهيئة: لم يتم تحميل ملف surveys_handler.js بشكل صحيح.";
+            statusMessage.className = 'message error';
+            startButton.style.display = 'none';
+        } else if (!isSurveyAvailable(SURVEY_TYPE)) {
             statusMessage.textContent = "لقد أكملت استبيان الـ 5 أسئلة اليوم. يرجى المحاولة غدًا.";
             statusMessage.className = 'message error';
             startButton.style.display = 'none';
@@ -90,13 +96,13 @@
             const currentQuestions = getCurrentSurveySet(SURVEY_TYPE);
             
             if (currentQuestions && currentQuestions.length > 0) {
-                // حفظ الأسئلة في الذاكرة المؤقتة (هنا يكمن حل المشكلة)
+                // حفظ الأسئلة في الذاكرة المؤقتة بالصيغة الصحيحة
                 localStorage.setItem(`current_survey_set_${SURVEY_TYPE}`, JSON.stringify(currentQuestions));
                 
                 // التوجيه لصفحة الحل
                 window.location.href = 'quick_survey_q5_1.html'; 
             } else {
-                statusMessage.textContent = "خطأ: لم يتم تحميل الأسئلة من قاعدة البيانات. يرجى التحقق من ملف surveys_handler.js.";
+                statusMessage.textContent = "خطأ: لم يتم تحميل أسئلة Q5 من قاعدة البيانات. يرجى التحقق من surveys_handler.js.";
                 statusMessage.className = 'message error';
             }
         };
