@@ -1,55 +1,0 @@
-    <script>
-        // دالة يتم استدعاؤها لعرض قائمة المهام (تحدي واحد لكل فئة)
-        function renderTaskList(category) {
-            const container = document.getElementById('tasks-list-container');
-            container.innerHTML = ''; // مسح رسالة "جاري التحميل"
-
-            // 1. تحديد ما إذا كان التحدي قد اكتمل اليوم (من tasks_handler.js)
-            const isChallengeCompleted = !isTaskAvailable(category); // isTaskAvailable تعني هل متاح للحل
-
-            const taskCard = document.createElement('div');
-            // نعرض تحدي واحد فقط لكل فئة
-            taskCard.className = `task-item-card ${isChallengeCompleted ? 'completed' : 'available'}`;
-            taskCard.onclick = isChallengeCompleted ? null : () => startChallenge(category);
-
-            // تحديد العنوان والنص
-            taskCard.innerHTML = `
-                <h3> تحدي ${category} اليومي (4 أسئلة)</h3>
-                <p>اختبر معلوماتك في ${category} واحصل على نقاط.</p>
-                <p>المكافأة الإجمالية: 40 نقطة (10 نقاط لكل سؤال)</p>
-                <span class="status">${isChallengeCompleted ? 'مكتملة ✅' : 'متاح للبدء'}</span>
-            `;
-            container.appendChild(taskCard);
-        }
-
-        // دالة بدء التحدي
-        function startChallenge(category) {
-            // 💡 الخطوة الأهم: نحفظ الفئة في الذاكرة المحلية
-            localStorage.setItem('current_task_category', category);
-
-            // التوجيه إلى صفحة الحل التي تحتوي على الأسئلة المتتالية
-            window.location.href = 'dynamic_task_question_solver.html';
-        }
-
-        // تشغيل المنطق عند تحميل الصفحة
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const category = urlParams.get('category'); // سيجلب القيمة مثل 'ديني' أو 'ثقافي'
-
-            if (category) {
-                // تحديث العنوان بناءً على الفئة العربية
-                document.getElementById('page-title').textContent = `تحديات اليوم - ${category}`;
-                document.getElementById('page-subtitle').textContent = `استكمل التحدي المتاح الآن!`;
-
-                // عرض التحدي الموحد للفئة المحددة
-                renderTaskList(category);
-            } else {
-                document.getElementById('tasks-list-container').innerHTML = `<p style="color: red; text-align: center;">
-                    خطأ: لم يتم تحديد فئة المهام. يرجى العودة للصفحة الرئيسية واختيار الفئة.
-                    <a href="task_categories_list.html" style="color: #3f51b5; display: block; margin-top: 15px; text-decoration: none;">الانتقال لصفحة الفئات</a>
-                </p>`;
-                document.getElementById('page-title').textContent = 'خطأ في التحميل';
-            }
-        });
-    </script>
-    
