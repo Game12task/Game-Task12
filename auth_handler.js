@@ -1,23 +1,33 @@
-// auth_handler.js
-// ملف التعامل مع مصادقة Firebase (التسجيل، الدخول، الخروج)
+// auth_handler.js - ملف التعامل مع مصادقة Firebase (التسجيل، الدخول، الخروج) (النسخة النهائية مع Firestore)
 
 // =======================================================
 // متطلبات التشغيل
 // =======================================================
-// يجب أن تكون مكتبات Firebase و firebase_config.js محملة قبل هذا الملف
-if (typeof firebase === 'undefined' || !firebase.auth) {
-    console.error("Firebase is not properly initialized or 'firebase-auth.js' is missing.");
+// يتم افتراض أن هذه المتغيرات (auth, db) متاحة عالميًا بعد تحميل مكتبات Firebase و firebase_config.js
+if (typeof firebase === 'undefined' || !firebase.auth || !firebase.firestore) {
+    console.error("Firebase services (Auth or Firestore) are not properly initialized or libraries are missing.");
 }
 
+// الوصول إلى الخدمات التي تم تهيئتها في firebase_config.js
 const auth = firebase.auth();
+const db = firebase.firestore(); // **الوصول إلى Firestore لقاعدة بيانات النقاط**
+
+// =======================================================
+// دوال المساعدة للواجهة
+// =======================================================
 const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
 const authMessage = document.getElementById('authMessage');
 
+function displayMessage(message, isError = true) {
+    authMessage.textContent = message;
+    authMessage.style.color = isError ? 'red' : 'green';
+}
+
 // =======================================================
 // 1. تبديل الواجهات (Login/Register)
 // =======================================================
-
+// (المنطق الأصلي الذي أرسلته)
 document.getElementById('showRegister').addEventListener('click', (e) => {
     e.preventDefault();
     document.getElementById('login-form-container').style.display = 'none';
@@ -34,17 +44,24 @@ document.getElementById('showLogin').addEventListener('click', (e) => {
 
 
 // =======================================================
-// 2. دالة عرض رسائل الخطأ/النجاح
+// 2. دالة إنشاء سجل النقاط في Firestore (مُضافة)
 // =======================================================
-
-function displayMessage(message, isError = true) {
-    authMessage.textContent = message;
-    authMessage.style.color = isError ? 'red' : 'green';
+function createNewUserRecord(user, userName) {
+    const userRef = db.collection("users").doc(user.uid);
+    
+    // إنشاء سجل المستخدم بالاسم والنقاط (تبدأ بـ 0)
+    return userRef.set({
+        id: user.uid,
+        name: userName,
+        email: user.email,
+        points: 0, 
+        lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
 }
 
-
 // =======================================================
-// 3. دالة إنشاء حساب جديد (التسجيل) - **تم التأكد من التحويل هنا**
+// 3. دالة إنشاء حساب جديد (التسجيل) - مع حفظ النقاط
 // =======================================================
 
 if (registerForm) {
@@ -52,14 +69,22 @@ if (registerForm) {
         e.preventDefault();
         const email = document.getElementById('registerEmail').value;
         const password = document.getElementById('registerPassword').value;
-
+        const userName = document.getElementById('registerName').value; // الاسم من login.html
+        
         displayMessage('جاري إنشاء الحساب...', false);
 
+        // 1. إنشاء المستخدم في Firebase Auth
         auth.createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                
+                // 2. إنشاء سجل النقاط في Firestore وتتبعه
+                return createNewUserRecord(user, userName);
+            })
             .then(() => {
                 displayMessage('تم إنشاء الحساب بنجاح! سيتم تحويلك.', false);
                 
-                // **✅ التحويل الفوري بعد النجاح**
+                // 3. التحويل الفوري بعد النجاح
                 setTimeout(() => {
                     window.location.href = 'offerwall.html';
                 }, 1000); 
@@ -72,7 +97,7 @@ if (registerForm) {
 
 
 // =======================================================
-// 4. دالة تسجيل الدخول - **تم التأكد من التحويل هنا**
+// 4. دالة تسجيل الدخول - مع تحديث آخر دخول
 // =======================================================
 
 if (loginForm) {
@@ -84,10 +109,19 @@ if (loginForm) {
         displayMessage('جاري تسجيل الدخول...', false);
 
         auth.signInWithEmailAndPassword(email, password)
-            .then(() => {
-                displayMessage('تم تسجيل الدخول بنجاح! سيتم تحويلك.', false);
+            .then((userCredential) => {
+                const user = userCredential.user;
                 
-                // **✅ التحويل الفوري بعد النجاح**
+                // تحديث تاريخ آخر دخول في قاعدة البيانات
+                const userRef = db.collection("users").doc(user.uid);
+                return userRef.update({
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            })
+            .then(() => {
+                 displayMessage('تم تسجيل الدخول بنجاح! سيتم تحويلك.', false);
+                
+                // التحويل الفوري بعد النجاح
                 setTimeout(() => {
                     window.location.href = 'offerwall.html';
                 }, 1000);
@@ -109,7 +143,7 @@ function signOutUser() {
         window.location.href = 'login.html';
     }).catch((error) => {
         console.error("Error signing out:", error);
-        console.error("حدث خطأ أثناء تسجيل الخروج. حاول مرة أخرى.");
+        alert("حدث خطأ أثناء تسجيل الخروج. حاول مرة أخرى.");
     });
 }
 
@@ -124,25 +158,16 @@ function checkAuthStatus(redirectOnSuccess = false) {
             // المستخدم مسجل دخوله
             console.log("User is logged in. UID:", user.uid);
             
-            // 1. التحديث التلقائي إذا كنا في صفحة الدخول (توجيه)
+            // التحديث التلقائي إذا كنا في صفحة الدخول (توجيه)
             if (window.location.pathname.includes('login.html') && redirectOnSuccess) {
                 window.location.href = 'offerwall.html';
             }
-
-            // 2. التحديث وتحميل CPA (مهم لصفحة offerwall.html)
-            if (window.location.pathname.includes('offerwall.html')) {
-                // نستخدم الدالة من offerwall_handler.js لتحميل CPA
-                if (typeof checkAuthStatusAndLoadCPA === 'function') {
-                    checkAuthStatusAndLoadCPA(user); 
-                }
-            }
-
         } else {
             // المستخدم غير مسجل دخوله
             console.log("User is logged out.");
             
             // إذا كنا في صفحة مؤمنة (offerwall.html) ولم يسجل دخوله، حوله إلى login.html
-            if (window.location.pathname.includes('offerwall.html')) {
+            if (window.location.pathname.includes('offerwall.html') || window.location.pathname.includes('index.html')) {
                 window.location.href = 'login.html';
             }
         }
@@ -153,3 +178,6 @@ function checkAuthStatus(redirectOnSuccess = false) {
 if (window.location.pathname.includes('login.html')) {
     checkAuthStatus(true);
 }
+
+// تصدير دالة تسجيل الخروج لتكون متاحة من أي صفحة أخرى
+window.signOutUser = signOutUser;
