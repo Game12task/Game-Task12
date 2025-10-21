@@ -10,10 +10,11 @@
         .stats { display: flex; gap: 30px; }
         .stat-box { background: #3498db; color: white; padding: 10px 20px; border-radius: 5px; text-align: center; }
         .content { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        /* تم إزالة روابط التنقل لأننا نركز على صفحة واحدة حالياً */
         .logout-btn { background-color: #e74c3c; border: none; color: white; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
         .logout-btn:hover { background-color: #c0392b; }
         h3 { border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; }
+        /* تأكد من أن لوحة العروض لها مساحة كافية للعرض */
+        #cpa-offerwall-container { margin-top: 20px; min-height: 500px; border: 1px solid #ddd; padding: 10px; }
     </style>
 </head>
 <body>
@@ -38,8 +39,11 @@
         </div>
 
         <h3 style="margin-top: 40px;">لوحة العروض (Offerwall)</h3>
-        <p>محتوى العروض سيظهر هنا قريباً. هذا المحتوى مؤمّن بالكامل.</p>
-        <p><strong>معرّف المستخدم (UID) الذي يجب استخدامه في روابط العروض:</strong> <span id="uidForCPA">...</span></p>
+        
+        <div id="cpa-offerwall-container">
+            </div>
+
+        <p style="margin-top: 20px;"><strong>معرّف المستخدم (UID) الذي يتم استخدامه في العروض:</strong> <span id="uidForCPA">...</span></p>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -50,11 +54,11 @@
     <script src="auth_handler.js"></script>
 
     <script>
-        // التأكد من أن المستخدم مسجل دخوله (auth_handler.js سيحول المستخدم إلى login.html إذا لم يكن مسجلاً)
+        // التأكد من أن المستخدم مسجل دخوله
         checkAuthStatus(); 
 
         // ----------------------------------------------------
-        // دالة سحب بيانات المستخدم من Firestore وعرضها
+        // دالة سحب بيانات المستخدم من Firestore وعرضها وتحميل CPA
         // ----------------------------------------------------
         auth.onAuthStateChanged(async (user) => {
             if (user) {
@@ -65,28 +69,62 @@
                     if (doc.exists) {
                         const userData = doc.data();
                         
-                        // عرض البيانات في الواجهة
+                        // عرض بيانات المستخدم
                         const userName = userData.name || 'عضو';
                         document.getElementById('userNameDisplay').textContent = userName;
                         document.getElementById('userPointsDisplay').textContent = userData.points || 0;
                         document.getElementById('userIdDisplay').textContent = userData.id || user.uid;
-                        document.getElementById('uidForCPA').textContent = user.uid; // لعرض الـ UID في الصفحة
+                        document.getElementById('uidForCPA').textContent = user.uid;
 
-                        // تخزين الـ UID في Local Storage لاستخدامه في إنشاء روابط العروض
+                        // 1. تخزين الـ UID في Local Storage لاستخدامه في إنشاء روابط العروض
                         localStorage.setItem('user_id', user.uid);
                         localStorage.setItem('user_name', userName); 
+                        
+                        // 2. تحميل كود CPA Offerwall هنا بعد التأكد من وجود UID
+                        loadCPAOfferwall(user.uid);
+
                     } else {
                         console.error("No user record found in Firestore. Logging out.");
-                        // إذا لم يتم العثور على سجل، يجب تسجيل الخروج
                         signOutUser();
                     }
                 } catch (error) {
                     console.error("Error fetching user data:", error);
-                    signOutUser(); // تسجيل خروج في حالة وجود خطأ في الاتصال
+                    signOutUser(); 
                 }
             } 
-            // إذا لم يكن مسجلاً، فدالة checkAuthStatus() تتولى التوجيه إلى login.html
         });
+
+        // دالة جديدة مخصصة لتحميل كود CPA بشكل آمن وديناميكي
+        function loadCPAOfferwall(userId) {
+            // كود الشبكة الخاص بك مع إدراج معرّف المستخدم (userId) في tracking_id
+            const scriptUrl = `https://installyourfiles.com/script_include.php?id=1850937&tracking_id=${userId}`;
+
+            // إنشاء عنصر <script> الأول
+            const script1 = document.createElement('script');
+            script1.type = 'text/javascript';
+            script1.textContent = 'var lck = false;';
+            
+            // إنشاء عنصر <script> الثاني لتحميل العروض وتمرير الـ UID
+            const script2 = document.createElement('script');
+            script2.type = 'text/javascript';
+            script2.src = scriptUrl;
+            
+            // إنشاء عنصر <script> الثالث لمعالجة الحظر
+            const script3 = document.createElement('script');
+            script3.type = 'text/javascript';
+            script3.textContent = "if(!lck){top.location = 'https://installyourfiles.com/help/ablk.php?lkt=4'; }";
+
+            // إنشاء عنصر <noscript>
+            const noscript = document.createElement('noscript');
+            noscript.innerHTML = 'Please enable JavaScript to access this page.<meta http-equiv="refresh" content="0;url=https://installyourfiles.com/help/enable_javascript.php?lkt=4" >';
+
+            // إضافة العناصر إلى الـ DOM
+            const container = document.getElementById('cpa-offerwall-container');
+            container.appendChild(script1);
+            container.appendChild(script2);
+            container.appendChild(script3);
+            container.appendChild(noscript);
+        }
     </script>
 </body>
 </html>
