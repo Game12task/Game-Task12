@@ -17,9 +17,21 @@ const firebaseConfig = {
 const app = firebase.initializeApp(firebaseConfig);
 
 // 3. تعريف الخدمات المطلوبة (أصبحت الآن متاحة كمتغيرات عامة)
-// سنقوم بتعريف الخدمات على أنها متغيرات عامة هنا لسهولة الوصول إليها
 const db = app.firestore();
 const auth = app.auth();
+
+// 4. (هام) تمكين التخزين المؤقت لـ Firestore (Persistence)
+// هذا يسمح للتطبيق بالعمل بشكل أسرع ويحل مشكلة "جاري التحميل..."
+db.enablePersistence()
+  .catch(function(err) {
+      if (err.code == 'failed-precondition') {
+          console.log("Multiple tabs open, Firestore persistence is disabled.");
+      } else if (err.code == 'unimplemented') {
+          console.log("The current browser does not support persistence.");
+      } else {
+          console.error("Failed to enable Firestore persistence:", err);
+      }
+  });
 
 // ملاحظة: الآن يمكنك الوصول إلى 'db' و 'auth' مباشرة في أي ملف JavaScript آخر
 // يتم تحميله بعد هذا الملف، مثل auth_handler.js.
