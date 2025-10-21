@@ -1,11 +1,92 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>تحميل التطبيق</title>
-    <meta http-equiv="refresh" content="0; url=login.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم الرئيسية</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #e9ebee; margin: 0; padding: 20px; color: #333; }
+        .header { background-color: #2c3e50; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .stats { display: flex; gap: 30px; }
+        .stat-box { background: #3498db; color: white; padding: 10px 20px; border-radius: 5px; text-align: center; }
+        .content { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        /* تم إزالة روابط التنقل لأننا نركز على صفحة واحدة حالياً */
+        .logout-btn { background-color: #e74c3c; border: none; color: white; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+        .logout-btn:hover { background-color: #c0392b; }
+        h3 { border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; }
+    </style>
 </head>
 <body>
-    <p>إذا لم يتم إعادة توجيهك، <a href="login.html">انقر هنا</a>.</p>
+    <div class="header">
+        <div>
+            <h2>أهلاً بك يا <span id="userNameDisplay">...</span></h2>
+        </div>
+        <button id="signOutButton" class="logout-btn" onclick="signOutUser()">تسجيل الخروج</button>
+    </div>
+
+    <div class="content">
+        <h3>ملخص حسابك</h3>
+        <div class="stats">
+            <div class="stat-box">
+                <div>النقاط الحالية</div>
+                <div id="userPointsDisplay" style="font-size: 2em; font-weight: bold;">0</div>
+            </div>
+            <div class="stat-box">
+                <div>رقم المعرّف (ID)</div>
+                <div id="userIdDisplay">جاري التحميل...</div>
+            </div>
+        </div>
+
+        <h3 style="margin-top: 40px;">لوحة العروض (Offerwall)</h3>
+        <p>محتوى العروض سيظهر هنا قريباً. هذا المحتوى مؤمّن بالكامل.</p>
+        <p><strong>معرّف المستخدم (UID) الذي يجب استخدامه في روابط العروض:</strong> <span id="uidForCPA">...</span></p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script src="firebase_config.js"></script>
+    <script src="auth_handler.js"></script>
+
+    <script>
+        // التأكد من أن المستخدم مسجل دخوله (auth_handler.js سيحول المستخدم إلى login.html إذا لم يكن مسجلاً)
+        checkAuthStatus(); 
+
+        // ----------------------------------------------------
+        // دالة سحب بيانات المستخدم من Firestore وعرضها
+        // ----------------------------------------------------
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                const userRef = db.collection("users").doc(user.uid);
+                
+                try {
+                    const doc = await userRef.get();
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        
+                        // عرض البيانات في الواجهة
+                        const userName = userData.name || 'عضو';
+                        document.getElementById('userNameDisplay').textContent = userName;
+                        document.getElementById('userPointsDisplay').textContent = userData.points || 0;
+                        document.getElementById('userIdDisplay').textContent = userData.id || user.uid;
+                        document.getElementById('uidForCPA').textContent = user.uid; // لعرض الـ UID في الصفحة
+
+                        // تخزين الـ UID في Local Storage لاستخدامه في إنشاء روابط العروض
+                        localStorage.setItem('user_id', user.uid);
+                        localStorage.setItem('user_name', userName); 
+                    } else {
+                        console.error("No user record found in Firestore. Logging out.");
+                        // إذا لم يتم العثور على سجل، يجب تسجيل الخروج
+                        signOutUser();
+                    }
+                } catch (error) {
+                    console.error("Error fetching user data:", error);
+                    signOutUser(); // تسجيل خروج في حالة وجود خطأ في الاتصال
+                }
+            } 
+            // إذا لم يكن مسجلاً، فدالة checkAuthStatus() تتولى التوجيه إلى login.html
+        });
+    </script>
 </body>
 </html>
