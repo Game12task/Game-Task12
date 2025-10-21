@@ -1,4 +1,4 @@
-// auth_handler.js - ملف التعامل مع مصادقة Firebase (التسجيل، الدخول، الخروج) (النسخة النهائية مع Firestore)
+// auth_handler.js - ملف التعامل مع مصادقة Firebase (التسجيل، الدخول، الخروج) (النسخة النهائية والمصححة)
 
 // =======================================================
 // متطلبات التشغيل
@@ -25,17 +25,18 @@ function displayMessage(message, isError = true) {
 }
 
 // =======================================================
-// 1. تبديل الواجهات (Login/Register)
+// 1. تبديل الواجهات (Login/Register) - (موجودة الآن في login.html)
 // =======================================================
-// (المنطق الأصلي الذي أرسلته)
-document.getElementById('showRegister').addEventListener('click', (e) => {
+// **تنبيه: تم الاحتفاظ بها لكنها غير مستخدمة في حالتنا الحالية لأن logic التبديل موجود في login.html**
+
+document.getElementById('showRegister')?.addEventListener('click', (e) => {
     e.preventDefault();
     document.getElementById('login-form-container').style.display = 'none';
     document.getElementById('register-form-container').style.display = 'block';
     authMessage.textContent = '';
 });
 
-document.getElementById('showLogin').addEventListener('click', (e) => {
+document.getElementById('showLogin')?.addEventListener('click', (e) => {
     e.preventDefault();
     document.getElementById('register-form-container').style.display = 'none';
     document.getElementById('login-form-container').style.display = 'block';
@@ -44,7 +45,7 @@ document.getElementById('showLogin').addEventListener('click', (e) => {
 
 
 // =======================================================
-// 2. دالة إنشاء سجل النقاط في Firestore (مُضافة)
+// 2. دالة إنشاء سجل النقاط في Firestore
 // =======================================================
 function createNewUserRecord(user, userName) {
     const userRef = db.collection("users").doc(user.uid);
@@ -61,7 +62,7 @@ function createNewUserRecord(user, userName) {
 }
 
 // =======================================================
-// 3. دالة إنشاء حساب جديد (التسجيل) - مع حفظ النقاط
+// 3. دالة إنشاء حساب جديد (التسجيل) - مع تحويل لـ index.html
 // =======================================================
 
 if (registerForm) {
@@ -84,9 +85,9 @@ if (registerForm) {
             .then(() => {
                 displayMessage('تم إنشاء الحساب بنجاح! سيتم تحويلك.', false);
                 
-                // 3. التحويل الفوري بعد النجاح
+                // 3. ✅ التحويل الفوري بعد النجاح إلى index.html
                 setTimeout(() => {
-                    window.location.href = 'offerwall.html';
+                    window.location.href = 'index.html'; 
                 }, 1000); 
             })
             .catch((error) => {
@@ -97,7 +98,7 @@ if (registerForm) {
 
 
 // =======================================================
-// 4. دالة تسجيل الدخول - مع تحديث آخر دخول
+// 4. دالة تسجيل الدخول - مع تحويل لـ index.html
 // =======================================================
 
 if (loginForm) {
@@ -121,9 +122,9 @@ if (loginForm) {
             .then(() => {
                  displayMessage('تم تسجيل الدخول بنجاح! سيتم تحويلك.', false);
                 
-                // التحويل الفوري بعد النجاح
+                // ✅ التحويل الفوري بعد النجاح إلى index.html
                 setTimeout(() => {
-                    window.location.href = 'offerwall.html';
+                    window.location.href = 'index.html';
                 }, 1000);
             })
             .catch((error) => {
@@ -158,16 +159,17 @@ function checkAuthStatus(redirectOnSuccess = false) {
             // المستخدم مسجل دخوله
             console.log("User is logged in. UID:", user.uid);
             
-            // التحديث التلقائي إذا كنا في صفحة الدخول (توجيه)
+            // ✅ التحديث التلقائي إذا كنا في صفحة الدخول (توجيه لـ index.html)
             if (window.location.pathname.includes('login.html') && redirectOnSuccess) {
-                window.location.href = 'offerwall.html';
+                window.location.href = 'index.html'; 
             }
         } else {
             // المستخدم غير مسجل دخوله
             console.log("User is logged out.");
             
-            // إذا كنا في صفحة مؤمنة (offerwall.html) ولم يسجل دخوله، حوله إلى login.html
-            if (window.location.pathname.includes('offerwall.html') || window.location.pathname.includes('index.html')) {
+            // إذا كنا في صفحة مؤمنة (index.html) ولم يسجل دخوله، حوله إلى login.html
+            // تم إزالة offerwall.html لأنها لم تعد الصفحة الرئيسية
+            if (window.location.pathname.includes('index.html')) { 
                 window.location.href = 'login.html';
             }
         }
