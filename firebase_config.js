@@ -1,9 +1,7 @@
 // firebase_config.js
-// يتم تهيئة Firebase هنا باستخدام الإعدادات الخاصة بمشروعك.
-// هذه الطريقة تتوافق مع نظام التحميل عبر CDN في ملف login.html
+// تم تهيئة Firebase هنا باستخدام الإعدادات الخاصة بمشروعك (طريقة المتغيرات العامة/CDN).
 
-// 2. إعدادات تطبيق الويب الخاص بك في Firebase
-// (لقد قمت بحذف مفتاح API هنا لأغراض الأمان، يرجى التأكد من استبدالها بالإعدادات الصحيحة في مشروعك)
+// 1. إعدادات تطبيق الويب الخاص بك
 const firebaseConfig = {
   apiKey: "AIzaSyAVcEik2fSkKcgPVEbX_ZbcfWKvKek6ClU", 
   authDomain: "game-task-84895.firebaseapp.com",
@@ -14,9 +12,14 @@ const firebaseConfig = {
   measurementId: "G-9SV2WYBKF7"
 };
 
-// 3. تهيئة Firebase
-// هذه الدالة (firebase.initializeApp) يتم توفيرها بواسطة مكتبة firebase-app.js التي تم تضمينها في login.html
-firebase.initializeApp(firebaseConfig);
+// 2. تهيئة التطبيق الأساسي
+// 'firebase' هو متغير عام (Global) يتم توفيره من خلال ملف firebase-app.js في HTML
+const app = firebase.initializeApp(firebaseConfig);
 
-// لا حاجة لتصدير المتغيرات (export) لأننا سنستخدمها كمتغيرات عامة (Global)
-// في auth_handler.js سنصل إلى خدمات المصادقة هكذا: firebase.auth() و firebase.firestore()
+// 3. تعريف الخدمات المطلوبة (أصبحت الآن متاحة كمتغيرات عامة)
+// سنقوم بتعريف الخدمات على أنها متغيرات عامة هنا لسهولة الوصول إليها
+const db = app.firestore();
+const auth = app.auth();
+
+// ملاحظة: الآن يمكنك الوصول إلى 'db' و 'auth' مباشرة في أي ملف JavaScript آخر
+// يتم تحميله بعد هذا الملف، مثل auth_handler.js.
