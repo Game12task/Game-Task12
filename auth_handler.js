@@ -1,6 +1,10 @@
 // auth_handler.js
+// ملف التعامل مع مصادقة Firebase (التسجيل، الدخول، الخروج)
 
-// تحقق من أن Firebase مهيأ بشكل صحيح في firebase_config.js
+// =======================================================
+// متطلبات التشغيل
+// =======================================================
+// يجب أن تكون مكتبات Firebase و firebase_config.js محملة قبل هذا الملف
 if (typeof firebase === 'undefined' || !firebase.auth) {
     console.error("Firebase is not properly initialized or 'firebase-auth.js' is missing.");
 }
@@ -11,21 +15,21 @@ const registerForm = document.getElementById('registerForm');
 const authMessage = document.getElementById('authMessage');
 
 // =======================================================
-// 1. تبديل الواجهات
+// 1. تبديل الواجهات (Login/Register)
 // =======================================================
 
 document.getElementById('showRegister').addEventListener('click', (e) => {
     e.preventDefault();
     document.getElementById('login-form-container').style.display = 'none';
     document.getElementById('register-form-container').style.display = 'block';
-    authMessage.textContent = ''; // مسح الرسائل
+    authMessage.textContent = '';
 });
 
 document.getElementById('showLogin').addEventListener('click', (e) => {
     e.preventDefault();
     document.getElementById('register-form-container').style.display = 'none';
     document.getElementById('login-form-container').style.display = 'block';
-    authMessage.textContent = ''; // مسح الرسائل
+    authMessage.textContent = '';
 });
 
 
@@ -43,104 +47,105 @@ function displayMessage(message, isError = true) {
 // 3. دالة إنشاء حساب جديد (التسجيل)
 // =======================================================
 
-registerForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = document.getElementById('registerEmail').value;
-    const password = document.getElementById('registerPassword').value;
+if (registerForm) {
+    registerForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('registerEmail').value;
+        const password = document.getElementById('registerPassword').value;
 
-    displayMessage('جاري إنشاء الحساب...', false);
+        displayMessage('جاري إنشاء الحساب...', false);
 
-    auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            // نجاح التسجيل
-            // UserCredential.user.uid هو معرف المستخدم (UID)
-            displayMessage('تم إنشاء الحساب بنجاح! سيتم تحويلك.', false);
-            // يمكنك إضافة خطوة حفظ بيانات إضافية للمستخدم في Firestore هنا إذا احتجت
-            
-            // تحويل المستخدم إلى صفحة العروض offerwall.html
-            setTimeout(() => {
-                window.location.href = 'offerwall.html';
-            }, 1000);
-
-        })
-        .catch((error) => {
-            // فشل التسجيل
-            displayMessage(`خطأ في التسجيل: ${error.message}`, true);
-        });
-});
+        auth.createUserWithEmailAndPassword(email, password)
+            .then(() => {
+                displayMessage('تم إنشاء الحساب بنجاح! سيتم تحويلك.', false);
+                
+                setTimeout(() => {
+                    window.location.href = 'offerwall.html';
+                }, 1000);
+            })
+            .catch((error) => {
+                displayMessage(`خطأ في التسجيل: ${error.message}`, true);
+            });
+    });
+}
 
 
 // =======================================================
 // 4. دالة تسجيل الدخول
 // =======================================================
 
-loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
+if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
 
-    displayMessage('جاري تسجيل الدخول...', false);
+        displayMessage('جاري تسجيل الدخول...', false);
 
-    auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            // نجاح تسجيل الدخول
-            displayMessage('تم تسجيل الدخول بنجاح! سيتم تحويلك.', false);
-            
-            // تحويل المستخدم إلى صفحة العروض offerwall.html
-            setTimeout(() => {
-                window.location.href = 'offerwall.html';
-            }, 1000);
-        })
-        .catch((error) => {
-            // فشل تسجيل الدخول
-            displayMessage(`خطأ في الدخول: ${error.message}`, true);
-        });
-});
-
-
-// =======================================================
-// 5. دالة تسجيل الخروج (مستخدمة في offerwall.html)
-// =======================================================
-
-function signOutUser() {
-    auth.signOut().then(() => {
-        // تم تسجيل الخروج بنجاح
-        console.log("User signed out.");
-        // تحويل المستخدم مرة أخرى إلى صفحة الدخول
-        window.location.href = 'login.html';
-    }).catch((error) => {
-        // حدث خطأ
-        console.error("Error signing out:", error);
-        alert("حدث خطأ أثناء تسجيل الخروج. حاول مرة أخرى.");
+        auth.signInWithEmailAndPassword(email, password)
+            .then(() => {
+                displayMessage('تم تسجيل الدخول بنجاح! سيتم تحويلك.', false);
+                
+                setTimeout(() => {
+                    window.location.href = 'offerwall.html';
+                }, 1000);
+            })
+            .catch((error) => {
+                displayMessage(`خطأ في الدخول: ${error.message}`, true);
+            });
     });
 }
 
 
 // =======================================================
-// 6. التحقق من حالة المصادقة عند تحميل الصفحات (مهم لتأمين الصفحات)
+// 5. دالة تسجيل الخروج (متاحة عالمياً ليستخدمها offerwall.html)
 // =======================================================
 
-// هذا الكود يمكن وضعه داخل offerwall.html مباشرة أو داخل offerwall_handler.js
-// لكن يفضل أن يكون في دالة يمكن استدعاؤها
+function signOutUser() {
+    auth.signOut().then(() => {
+        console.log("User signed out.");
+        window.location.href = 'login.html';
+    }).catch((error) => {
+        console.error("Error signing out:", error);
+        // نستخدم console.error بدلاً من alert() لتجنب المشاكل في iframe
+        console.error("حدث خطأ أثناء تسجيل الخروج. حاول مرة أخرى.");
+    });
+}
+
+
+// =======================================================
+// 6. التحقق من حالة المصادقة (وظيفة تأمين الصفحات)
+// =======================================================
+
 function checkAuthStatus(redirectOnSuccess = false) {
     auth.onAuthStateChanged((user) => {
         if (user) {
             // المستخدم مسجل دخوله
             console.log("User is logged in. UID:", user.uid);
             
-            // إذا كنا في صفحة الدخول (login.html) وسجل دخوله، حوله إلى offerwall.html
+            // 1. التحديث التلقائي إذا كنا في صفحة الدخول
             if (window.location.pathname.includes('login.html') && redirectOnSuccess) {
                 window.location.href = 'offerwall.html';
             }
 
-            // إذا كنت في offerwall.html، يمكنك تحديث واجهة المستخدم هنا
-            // (مثل استدعاء updateUI(user) من offerwall_handler.js)
+            // 2. تحديث واجهة المستخدم وتحميل CPA (مهم لصفحة offerwall.html)
+            if (window.location.pathname.includes('offerwall.html')) {
+                // تحديث اسم المستخدم ورصيده في واجهة offerwall
+                if (typeof updateUI === 'function') {
+                    updateUI(user);
+                }
+
+                // تحميل عروض CPA وإضافة UID المستخدم لها
+                if (typeof loadCpaLocker === 'function') {
+                    loadCpaLocker(user.uid); 
+                }
+            }
 
         } else {
-            // المستخدم غير مسجل دخوله
+            // المستخدم غير مسجل دخوله (الإجابة "لا" من Firebase)
             console.log("User is logged out.");
             
-            // إذا كنا في صفحة مؤمنة (مثل offerwall.html) ولم يسجل دخوله، حوله إلى login.html
+            // إذا كنا في صفحة مؤمنة (offerwall.html) ولم يسجل دخوله، حوله إلى login.html
             if (window.location.pathname.includes('offerwall.html')) {
                 window.location.href = 'login.html';
             }
@@ -149,7 +154,6 @@ function checkAuthStatus(redirectOnSuccess = false) {
 }
 
 // عند تحميل login.html، تحقق مما إذا كان المستخدم مسجلاً بالفعل
-// (هذا يمنع المستخدم من البقاء في login.html إذا كان قد سجل دخوله بالفعل)
 if (window.location.pathname.includes('login.html')) {
     checkAuthStatus(true);
 }
