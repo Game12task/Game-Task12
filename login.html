@@ -11,6 +11,7 @@
         input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; }
         button:hover { background-color: #0056b3; }
+        #authMessage.success { color: green; }
     </style>
 </head>
 <body>
@@ -22,7 +23,7 @@
             <form id="loginForm">
                 <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" required>
                 <input type="password" id="loginPassword" placeholder="كلمة المرور" required>
-                <button type="submit">دخول</button>
+                <button type="submit" id="loginBtn">دخول</button>
             </form>
             <p>لا تملك حساباً؟ <a href="#" id="showRegister">سجّل الآن</a></p>
         </div>
@@ -30,19 +31,120 @@
         <div id="register-form-container" style="display:none;">
             <h2>إنشاء حساب جديد</h2>
             <form id="registerForm">
+                <input type="text" id="registerName" placeholder="اسم المستخدم" required>
                 <input type="email" id="registerEmail" placeholder="البريد الإلكتروني" required>
                 <input type="password" id="registerPassword" placeholder="كلمة المرور (6 أحرف أو أكثر)" required>
-                <button type="submit">تسجيل</button>
+                <button type="submit" id="registerBtn">تسجيل</button>
             </form>
             <p>لديك حساب بالفعل؟ <a href="#" id="showLogin">تسجيل الدخول</a></p>
         </div>
 
-        <p id="authMessage" style="color: red; margin-top: 10px;"></p>
+        <p id="authMessage" style="margin-top: 10px;"></p>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
     <script src="firebase_config.js"></script>
     <script src="auth_handler.js"></script>
+    
+    <script>
+        // استيراد دوال التسجيل والدخول من auth_handler.js
+        // بما أننا نستخدم المتغيرات العامة، يجب تعريف الدالتين هنا باستخدام 'export' 
+        // أو التأكد من أن الملف محمل كنظام وحدات (Module)، لكن لتبسيط الأمور، سنفترض أنه تم تصديرهما
+        // إذا كان auth_handler.js لا يستخدم export، سنصل إليهما مباشرة، لكننا اعتمدنا export 
+        // لذلك يجب تغيير طريقة تحميل الملفات لتكون وحدات:
+        // ******************************************************************************
+        // ملاحظة هامة: لتجنب المشاكل في تحميل الوحدات (Modules) في طريقة المتغيرات العامة (V8)، 
+        // سنفترض أننا سنستخدم طريقة تحميل `type="module"` للتأكد من وصولنا للدوال
+        // إذا كان متصفحك لا يدعم الوحدات، يجب إزالة `export` من auth_handler.js.
+        // لنستمر الآن بافتراض أن الدوال متاحة بشكل عام.
+        // ******************************************************************************
+
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const showRegisterLink = document.getElementById('showRegister');
+        const showLoginLink = document.getElementById('showLogin');
+        const loginContainer = document.getElementById('login-form-container');
+        const registerContainer = document.getElementById('register-form-container');
+        const authMessage = document.getElementById('authMessage');
+
+        // دالة التبديل بين النماذج
+        showRegisterLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginContainer.style.display = 'none';
+            registerContainer.style.display = 'block';
+            authMessage.textContent = '';
+        });
+
+        showLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerContainer.style.display = 'none';
+            loginContainer.style.display = 'block';
+            authMessage.textContent = '';
+        });
+        
+        // دالة لعرض الرسائل
+        function displayMessage(message, isError = true) {
+            authMessage.textContent = message;
+            authMessage.style.color = isError ? 'red' : 'green';
+        }
+
+        // معالجة نموذج التسجيل (Registration)
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const name = document.getElementById('registerName').value; // الاسم الجديد
+
+            displayMessage("جارٍ التسجيل...", false);
+
+            // استدعاء دالة التسجيل من auth_handler.js
+            const result = await registerUser(email, password, name);
+
+            if (result.success) {
+                displayMessage(`تم التسجيل بنجاح! مرحباً بك يا ${name}`, false);
+                // توجيه المستخدم إلى الصفحة الرئيسية (index.html)
+                setTimeout(() => {
+                    window.location.href = 'index.html'; 
+                }, 1500);
+            } else {
+                displayMessage(`فشل التسجيل: ${result.message}`);
+            }
+        });
+
+        // معالجة نموذج تسجيل الدخول (Login)
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            displayMessage("جارٍ تسجيل الدخول...", false);
+
+            // استدعاء دالة تسجيل الدخول من auth_handler.js
+            const result = await loginUser(email, password);
+
+            if (result.success) {
+                displayMessage("تم تسجيل الدخول بنجاح!", false);
+                // توجيه المستخدم إلى الصفحة الرئيسية (index.html)
+                setTimeout(() => {
+                    window.location.href = 'index.html'; 
+                }, 1500);
+            } else {
+                displayMessage(`فشل الدخول: ${result.message}`);
+            }
+        });
+        
+        // التحقق من حالة المستخدم عند تحميل الصفحة
+        // إذا كان مسجلاً دخوله بالفعل، نقوم بتوجيهه
+        checkAuthState((user) => {
+            if (user) {
+                // المستخدم مسجل دخوله، لا داعي للبقاء في صفحة الدخول
+                window.location.href = 'index.html';
+            }
+            // إذا لم يكن مسجلاً، لا تفعل شيئاً ليتمكن من الدخول أو التسجيل
+        });
+    </script>
 </body>
 </html>
