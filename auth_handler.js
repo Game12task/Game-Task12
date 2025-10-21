@@ -4,6 +4,7 @@
 // =======================================================
 // متطلبات التشغيل
 // =======================================================
+// يجب أن تكون مكتبات Firebase و firebase_config.js محملة قبل هذا الملف
 if (typeof firebase === 'undefined' || !firebase.auth) {
     console.error("Firebase is not properly initialized or 'firebase-auth.js' is missing.");
 }
@@ -13,12 +14,108 @@ const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
 const authMessage = document.getElementById('authMessage');
 
-// [باقي الدوال (تبديل الواجهات، التسجيل، الدخول، الخروج) كما هي...]
-// (أفترض أنها موجودة وصحيحة من الخطوات السابقة)
+// =======================================================
+// 1. تبديل الواجهات (Login/Register)
+// =======================================================
+
+document.getElementById('showRegister').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('login-form-container').style.display = 'none';
+    document.getElementById('register-form-container').style.display = 'block';
+    authMessage.textContent = '';
+});
+
+document.getElementById('showLogin').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('register-form-container').style.display = 'none';
+    document.getElementById('login-form-container').style.display = 'block';
+    authMessage.textContent = '';
+});
 
 
 // =======================================================
-// 6. التحقق من حالة المصادقة (وظيفة تأمين الصفحات) - التعديل هنا
+// 2. دالة عرض رسائل الخطأ/النجاح
+// =======================================================
+
+function displayMessage(message, isError = true) {
+    authMessage.textContent = message;
+    authMessage.style.color = isError ? 'red' : 'green';
+}
+
+
+// =======================================================
+// 3. دالة إنشاء حساب جديد (التسجيل) - **تم التأكد من التحويل هنا**
+// =======================================================
+
+if (registerForm) {
+    registerForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('registerEmail').value;
+        const password = document.getElementById('registerPassword').value;
+
+        displayMessage('جاري إنشاء الحساب...', false);
+
+        auth.createUserWithEmailAndPassword(email, password)
+            .then(() => {
+                displayMessage('تم إنشاء الحساب بنجاح! سيتم تحويلك.', false);
+                
+                // **✅ التحويل الفوري بعد النجاح**
+                setTimeout(() => {
+                    window.location.href = 'offerwall.html';
+                }, 1000); 
+            })
+            .catch((error) => {
+                displayMessage(`خطأ في التسجيل: ${error.message}`, true);
+            });
+    });
+}
+
+
+// =======================================================
+// 4. دالة تسجيل الدخول - **تم التأكد من التحويل هنا**
+// =======================================================
+
+if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+
+        displayMessage('جاري تسجيل الدخول...', false);
+
+        auth.signInWithEmailAndPassword(email, password)
+            .then(() => {
+                displayMessage('تم تسجيل الدخول بنجاح! سيتم تحويلك.', false);
+                
+                // **✅ التحويل الفوري بعد النجاح**
+                setTimeout(() => {
+                    window.location.href = 'offerwall.html';
+                }, 1000);
+            })
+            .catch((error) => {
+                displayMessage(`خطأ في الدخول: ${error.message}`, true);
+            });
+    });
+}
+
+
+// =======================================================
+// 5. دالة تسجيل الخروج
+// =======================================================
+
+function signOutUser() {
+    auth.signOut().then(() => {
+        console.log("User signed out.");
+        window.location.href = 'login.html';
+    }).catch((error) => {
+        console.error("Error signing out:", error);
+        console.error("حدث خطأ أثناء تسجيل الخروج. حاول مرة أخرى.");
+    });
+}
+
+
+// =======================================================
+// 6. التحقق من حالة المصادقة (وظيفة تأمين الصفحات)
 // =======================================================
 
 function checkAuthStatus(redirectOnSuccess = false) {
@@ -34,7 +131,7 @@ function checkAuthStatus(redirectOnSuccess = false) {
 
             // 2. التحديث وتحميل CPA (مهم لصفحة offerwall.html)
             if (window.location.pathname.includes('offerwall.html')) {
-                // **هذا السطر يستدعي الدالة الجديدة من offerwall_handler.js**
+                // نستخدم الدالة من offerwall_handler.js لتحميل CPA
                 if (typeof checkAuthStatusAndLoadCPA === 'function') {
                     checkAuthStatusAndLoadCPA(user); 
                 }
@@ -52,4 +149,7 @@ function checkAuthStatus(redirectOnSuccess = false) {
     });
 }
 
-// ... [باقي الكود في auth_handler.js]
+// عند تحميل login.html، تحقق مما إذا كان المستخدم مسجلاً بالفعل
+if (window.location.pathname.includes('login.html')) {
+    checkAuthStatus(true);
+}
