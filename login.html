@@ -20,7 +20,7 @@
         
         <div id="login-form-container">
             <h2>تسجيل الدخول</h2>
-            <form id="loginForm">
+            <form id="loginForm"> 
                 <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" required>
                 <input type="password" id="loginPassword" placeholder="كلمة المرور" required>
                 <button type="submit" id="loginBtn">دخول</button>
@@ -30,7 +30,7 @@
 
         <div id="register-form-container" style="display:none;">
             <h2>إنشاء حساب جديد</h2>
-            <form id="registerForm">
+            <form id="registerForm"> 
                 <input type="text" id="registerName" placeholder="اسم المستخدم" required>
                 <input type="email" id="registerEmail" placeholder="البريد الإلكتروني" required>
                 <input type="password" id="registerPassword" placeholder="كلمة المرور (6 أحرف أو أكثر)" required>
@@ -51,20 +51,23 @@
         const registerContainer = document.getElementById('register-form-container');
         const authMessage = document.getElementById('authMessage');
 
-        // دالة التبديل بين النماذج (نفس المنطق الذي كنت تستخدمه)
-        showRegisterLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginContainer.style.display = 'none';
-            registerContainer.style.display = 'block';
-            authMessage.textContent = '';
-        });
+        // دالة التبديل بين نماذج الدخول والتسجيل
+        if (showRegisterLink && showLoginLink) {
+            
+            showRegisterLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginContainer.style.display = 'none';
+                registerContainer.style.display = 'block';
+                authMessage.textContent = ''; // مسح الرسالة عند التبديل
+            });
 
-        showLoginLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            registerContainer.style.display = 'none';
-            loginContainer.style.display = 'block';
-            authMessage.textContent = '';
-        });
+            showLoginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                registerContainer.style.display = 'none';
+                loginContainer.style.display = 'block';
+                authMessage.textContent = ''; // مسح الرسالة عند التبديل
+            });
+        }
     </script>
 </body>
 </html>
