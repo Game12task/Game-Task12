@@ -7,14 +7,22 @@
     <style>
         body { font-family: Arial, sans-serif; background-color: #e9ebee; margin: 0; padding: 20px; color: #333; }
         .header { background-color: #2c3e50; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .stats { display: flex; gap: 30px; }
-        .stat-box { background: #3498db; color: white; padding: 10px 20px; border-radius: 5px; text-align: center; }
+        .stats { display: flex; flex-wrap: wrap; gap: 30px; } /* إضافة flex-wrap للتحسين على الجوال */
+        .stat-box { 
+            background: #3498db; 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            text-align: center; 
+            min-width: 150px; /* لضمان مظهر جيد */
+        }
         .content { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .logout-btn { background-color: #e74c3c; border: none; color: white; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
         .logout-btn:hover { background-color: #c0392b; }
         h3 { border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; }
         /* تأكد من أن لوحة العروض لها مساحة كافية للعرض */
-        #cpa-offerwall-container { margin-top: 20px; min-height: 500px; border: 1px solid #ddd; padding: 10px; }
+        #cpa-offerwall-container { margin-top: 20px; min-height: 500px; border: 1px solid #ddd; padding: 10px; overflow: hidden; }
+        #userIdDisplay { overflow-wrap: break-word; font-size: 0.8em; } /* تحسين لعرض الـ ID الطويل */
     </style>
 </head>
 <body>
@@ -22,7 +30,7 @@
         <div>
             <h2>أهلاً بك يا <span id="userNameDisplay">...</span></h2>
         </div>
-        <button id="signOutButton" class="logout-btn" onclick="signOutUser()">تسجيل الخروج</button>
+        <button id="logoutButton" class="logout-btn">تسجيل الخروج</button> 
     </div>
 
     <div class="content">
@@ -46,37 +54,40 @@
         <p style="margin-top: 20px;"><strong>معرّف المستخدم (UID) الذي يتم استخدامه في العروض:</strong> <span id="uidForCPA">...</span></p>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script type="module" src="firebase_config.js"></script>
+    <script type="module" src="auth_handler.js"></script>
 
-    <script src="firebase_config.js"></script>
-    <script src="auth_handler.js"></script>
-
-    <script>
-        // التأكد من أن المستخدم مسجل دخوله
-        checkAuthStatus(); 
+    <script type="module">
+        // ----------------------------------------------------
+        // يجب استيراد الدوال من ملفات JS الأخرى (V9)
+        import { auth, db } from "./firebase_config.js"; 
+        import { onAuthStateChanged } from "firebase/auth";
+        import { doc, getDoc } from "firebase/firestore";
 
         // ----------------------------------------------------
         // دالة سحب بيانات المستخدم من Firestore وعرضها وتحميل CPA
         // ----------------------------------------------------
-        auth.onAuthStateChanged(async (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                const userRef = db.collection("users").doc(user.uid);
+                // إظهار ID مؤقتًا ريثما يتم جلب البيانات
+                document.getElementById('userIdDisplay').textContent = user.uid;
+                document.getElementById('uidForCPA').textContent = user.uid;
+                
+                const userRef = doc(db, "users", user.uid);
                 
                 try {
-                    const doc = await userRef.get();
-                    if (doc.exists) {
-                        const userData = doc.data();
+                    const docSnap = await getDoc(userRef); // استخدام getDoc (V9)
+                    
+                    if (docSnap.exists()) {
+                        const userData = docSnap.data();
                         
-                        // عرض بيانات المستخدم
+                        // عرض بيانات المستخدم النهائية
                         const userName = userData.name || 'عضو';
                         document.getElementById('userNameDisplay').textContent = userName;
-                        document.getElementById('userPointsDisplay').textContent = userData.points || 0;
-                        document.getElementById('userIdDisplay').textContent = userData.id || user.uid;
-                        document.getElementById('uidForCPA').textContent = user.uid;
+                        // نستخدم || 0 للتأكد من عرض قيمة حتى لو كانت النقاط غير معرفة
+                        document.getElementById('userPointsDisplay').textContent = userData.points || 0; 
 
-                        // 1. تخزين الـ UID في Local Storage لاستخدامه في إنشاء روابط العروض
+                        // 1. تخزين الـ UID و الاسم في Local Storage (للاستخدام في صفحات المهام الأخرى)
                         localStorage.setItem('user_id', user.uid);
                         localStorage.setItem('user_name', userName); 
                         
@@ -84,17 +95,21 @@
                         loadCPAOfferwall(user.uid);
 
                     } else {
-                        console.error("No user record found in Firestore. Logging out.");
-                        signOutUser();
+                        // إذا تم الدخول عبر Auth لكن لم يُنشأ سجل في Firestore
+                        console.error("No user record found in Firestore. Please register again.");
+                        // استخدام دالة تسجيل الخروج المصدرة من auth_handler
+                        window.signOutUser(); 
                     }
                 } catch (error) {
                     console.error("Error fetching user data:", error);
-                    signOutUser(); 
+                    // استخدام دالة تسجيل الخروج المصدرة من auth_handler
+                    window.signOutUser();
                 }
             } 
+            // ملاحظة: حالة عدم تسجيل الدخول يتم معالجتها بالفعل في auth_handler.js
         });
 
-        // دالة جديدة مخصصة لتحميل كود CPA بشكل آمن وديناميكي
+        // دالة جديدة مخصصة لتحميل كود CPA بشكل آمن وديناميكي (بدون تغيير)
         function loadCPAOfferwall(userId) {
             // كود الشبكة الخاص بك مع إدراج معرّف المستخدم (userId) في tracking_id
             const scriptUrl = `https://installyourfiles.com/script_include.php?id=1850937&tracking_id=${userId}`;
@@ -120,6 +135,7 @@
 
             // إضافة العناصر إلى الـ DOM
             const container = document.getElementById('cpa-offerwall-container');
+            container.innerHTML = ''; // تنظيف المحتوى قبل الإضافة
             container.appendChild(script1);
             container.appendChild(script2);
             container.appendChild(script3);
