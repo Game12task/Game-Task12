@@ -1,4 +1,4 @@
-// auth_handler.js - ملف التعامل مع مصادقة Firebase (التسجيل، الدخول، الخروج) (النسخة المحدثة لـ V9)
+// auth_handler.js - ملف التعامل مع مصادقة Firebase (التسجيل، الدخول، الخروج)
 
 // =======================================================
 // متطلبات التشغيل (استيراد الدوال والخدمات من firebase_config.js)
@@ -14,21 +14,36 @@ import {
     doc, 
     setDoc, 
     updateDoc,
-    serverTimestamp 
+    serverTimestamp,
+    getDoc 
 } from "firebase/firestore";
 
 // =======================================================
-// دوال المساعدة للواجهة (تبقى كما هي)
+// دوال المساعدة للواجهة
 // =======================================================
 const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
 const authMessage = document.getElementById('authMessage');
-const logoutButton = document.getElementById('logoutButton'); // زر تسجيل الخروج في index.html
+const logoutButton = document.getElementById('logoutButton');
 
 function displayMessage(message, isError = true) {
     if (authMessage) {
         authMessage.textContent = message;
         authMessage.style.color = isError ? 'red' : 'green';
+    }
+}
+
+// دالة تحديث واجهة المستخدم بالـ ID والنقاط
+function updateUI(user) {
+    const userIdDisplay = document.getElementById('userIdDisplay');
+    if (userIdDisplay) {
+        // عرض الـ UID كاملاً
+        userIdDisplay.textContent = user ? user.uid : 'غير مسجل';
+    }
+
+    // استدعاء دالة تحميل النقاط والمهام من tasks_handler إذا كانت موجودة
+    if (user && window.loadUserTasksAndPoints) {
+        window.loadUserTasksAndPoints(user.uid);
     }
 }
 
@@ -38,7 +53,7 @@ function displayMessage(message, isError = true) {
 async function createNewUserRecord(user, userName) {
     const userRef = doc(db, "users", user.uid);
     
-    // استخدام setDoc لحفظ سجل المستخدم الجديد
+    // إنشاء سجل المستخدم بالاسم الذي أدخله
     return await setDoc(userRef, {
         id: user.uid,
         name: userName,
@@ -62,11 +77,11 @@ if (registerForm) {
         displayMessage('جاري إنشاء الحساب...', false);
 
         try {
-            // 1. إنشاء المستخدم في Firebase Auth (V9)
+            // 1. إنشاء المستخدم في Firebase Auth
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             
-            // 2. إنشاء سجل النقاط في Firestore 
+            // 2. إنشاء سجل النقاط في Firestore
             await createNewUserRecord(user, userName);
             
             displayMessage('تم إنشاء الحساب بنجاح! سيتم تحويلك.', false);
@@ -94,11 +109,11 @@ if (loginForm) {
         displayMessage('جاري تسجيل الدخول...', false);
 
         try {
-            // 1. تسجيل الدخول في Firebase Auth (V9)
+            // 1. تسجيل الدخول في Firebase Auth
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // 2. تحديث تاريخ آخر دخول في قاعدة البيانات (V9)
+            // 2. تحديث تاريخ آخر دخول في قاعدة البيانات 
             const userRef = doc(db, "users", user.uid);
             await updateDoc(userRef, {
                 lastLogin: serverTimestamp()
@@ -123,51 +138,47 @@ if (loginForm) {
 if (logoutButton) {
     logoutButton.addEventListener('click', async () => {
         try {
-            await signOut(auth); // دالة تسجيل الخروج (V9)
+            await signOut(auth);
             console.log("User signed out.");
             window.location.href = 'login.html';
         } catch (error) {
             console.error("Error signing out:", error);
-            alert("حدث خطأ أثناء تسجيل الخروج. حاول مرة أخرى.");
+            displayMessage("حدث خطأ أثناء تسجيل الخروج. حاول مرة أخرى.", true); 
         }
     });
 }
 
 
 // =======================================================
-// 5. التحقق من حالة المصادقة (وظيفة تأمين الصفحات)
+// 5. التحقق من حالة المصادقة وتأمين الصفحات
 // =======================================================
-function checkAuthStatus(redirectOnSuccess = false) {
-    // استخدام onAuthStateChanged (V9)
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            // المستخدم مسجل دخوله
-            console.log("User is logged in. UID:", user.uid);
-            
-            // حفظ بيانات المستخدم في التخزين المحلي للاستخدام في الواجهة
-            localStorage.setItem('user_id', user.uid); 
-            localStorage.setItem('username', user.displayName || user.email);
-            
-            // التوجيه إذا كنا في صفحة الدخول (login.html)
-            if (window.location.pathname.includes('login.html') && redirectOnSuccess) {
-                window.location.href = 'index.html'; 
-            }
-        } else {
-            // المستخدم غير مسجل دخوله
-            console.log("User is logged out.");
-            localStorage.removeItem('user_id');
-            localStorage.removeItem('username');
-            
-            // تأمين الصفحة الرئيسية (index.html)
-            if (window.location.pathname.includes('index.html')) { 
-                window.location.href = 'login.html';
-            }
+// هذه الدالة تعمل على مدار عمر التطبيق لتحديث حالة المستخدم والتحويل عند اللزوم
+onAuthStateChanged(auth, (user) => {
+    const isLoginPage = window.location.pathname.includes('login.html');
+    const isIndexPage = window.location.pathname.includes('index.html') || window.location.pathname === '/';
+
+    if (user) {
+        // المستخدم مسجل دخوله 
+        console.log("User is logged in. UID:", user.uid);
+        updateUI(user);
+        
+        // إذا كان في صفحة الدخول وهو مسجل، نوجّهه إلى الصفحة الرئيسية
+        if (isLoginPage) {
+            window.location.href = 'index.html'; 
         }
-    });
-}
 
-// تنفيذ التحقق عند تحميل الصفحة
-checkAuthStatus(window.location.pathname.includes('login.html'));
+    } else {
+        // المستخدم غير مسجل دخوله
+        console.log("User is logged out.");
+        updateUI(null);
+        
+        // إذا كان في الصفحة الرئيسية وهو غير مسجل، نوجّهه إلى صفحة الدخول (تأمين الصفحة)
+        if (isIndexPage) { 
+            window.location.href = 'login.html';
+        }
+    }
+});
 
-// تصدير دالة تسجيل الخروج للتحكم من أي مكان
-window.signOutUser = () => signOut(auth).then(() => { window.location.href = 'login.html'; }).catch(console.error);
+
+// تصدير دالة تحديث الواجهة لتستخدم في ملفات أخرى
+export { updateUI };
