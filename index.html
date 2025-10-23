@@ -3,144 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم الرئيسية</title>
+    <title>مركز المهام والعروض لكسب المال</title>
+    
     <style>
-        body { font-family: Arial, sans-serif; background-color: #e9ebee; margin: 0; padding: 20px; color: #333; }
-        .header { background-color: #2c3e50; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .stats { display: flex; flex-wrap: wrap; gap: 30px; } /* إضافة flex-wrap للتحسين على الجوال */
-        .stat-box { 
-            background: #3498db; 
-            color: white; 
-            padding: 10px 20px; 
-            border-radius: 5px; 
-            text-align: center; 
-            min-width: 150px; /* لضمان مظهر جيد */
+        /* 🎨 1. التصميم العام والخلفية الداكنة (بدون تغيير) 🎨 */
+        body {
+            background-color: #121212; 
+            color: #f0f0f0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
         }
-        .content { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .logout-btn { background-color: #e74c3c; border: none; color: white; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
-        .logout-btn:hover { background-color: #c0392b; }
-        h3 { border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; }
-        /* تأكد من أن لوحة العروض لها مساحة كافية للعرض */
-        #cpa-offerwall-container { margin-top: 20px; min-height: 500px; border: 1px solid #ddd; padding: 10px; overflow: hidden; }
-        #userIdDisplay { overflow-wrap: break-word; font-size: 0.8em; } /* تحسين لعرض الـ ID الطويل */
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 30px;
+        }
+
+        /* 🖼️ 2. تصميم لوحات المهام الشفافة (بدون تغيير) 🖼️ */
+        .cpa-widget-container, 
+        .survey-widget-container {
+            background-color: rgba(255, 255, 255, 0.05); 
+            border: 1px solid rgba(255, 255, 255, 0.15); 
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* تصميم رؤوس اللوحات والأيقونات (بدون تغيير) */
+        .cpa-header, .survey-header {
+            display: flex;
+            align-items: center;
+            color: #fff;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .cpa-header h2, .survey-header h2 { margin: 0; font-size: 22px; font-weight: 700; }
+        .crown-icon { font-size: 28px; color: #FFD700; margin-left: 10px; }
+        .survey-icon { font-size: 28px; color: #4CAF50; margin-left: 10px; } 
+
+        /* ⚙️ 3. CSS نظام التبويبات (بدون تغيير) ⚙️ */
+        .survey-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+            padding: 5px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        .tab-button {
+            background-color: transparent;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            margin: 0 5px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.3s, color 0.3s;
+            font-weight: bold;
+        }
+        .tab-button:hover { background-color: rgba(255, 255, 255, 0.1); }
+        .tab-button.active { background-color: #4CAF50; color: #fff; }
+        .survey-content { display: none; min-height: 600px; }
+        .survey-content.active { display: block; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div>
-            <h2>أهلاً بك يا <span id="userNameDisplay">...</span></h2>
-        </div>
-        <button id="logoutButton" class="logout-btn">تسجيل الخروج</button> 
-    </div>
 
-    <div class="content">
-        <h3>ملخص حسابك</h3>
-        <div class="stats">
-            <div class="stat-box">
-                <div>النقاط الحالية</div>
-                <div id="userPointsDisplay" style="font-size: 2em; font-weight: bold;">0</div>
-            </div>
-            <div class="stat-box">
-                <div>رقم المعرّف (ID)</div>
-                <div id="userIdDisplay">جاري التحميل...</div>
-            </div>
-        </div>
+    <script>
+        // 1. محاولة تحميل الاسم المحفوظ
+        let userID = localStorage.getItem('usernameID');
 
-        <h3 style="margin-top: 40px;">لوحة العروض (Offerwall)</h3>
-        
-        <div id="cpa-offerwall-container">
-            </div>
-
-        <p style="margin-top: 20px;"><strong>معرّف المستخدم (UID) الذي يتم استخدامه في العروض:</strong> <span id="uidForCPA">...</span></p>
-    </div>
-
-    <script type="module" src="firebase_config.js"></script>
-    <script type="module" src="auth_handler.js"></script>
-
-    <script type="module">
-        // ----------------------------------------------------
-        // يجب استيراد الدوال من ملفات JS الأخرى (V9)
-        import { auth, db } from "./firebase_config.js"; 
-        import { onAuthStateChanged } from "firebase/auth";
-        import { doc, getDoc } from "firebase/firestore";
-
-        // ----------------------------------------------------
-        // دالة سحب بيانات المستخدم من Firestore وعرضها وتحميل CPA
-        // ----------------------------------------------------
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // إظهار ID مؤقتًا ريثما يتم جلب البيانات
-                document.getElementById('userIdDisplay').textContent = user.uid;
-                document.getElementById('uidForCPA').textContent = user.uid;
-                
-                const userRef = doc(db, "users", user.uid);
-                
-                try {
-                    const docSnap = await getDoc(userRef); // استخدام getDoc (V9)
-                    
-                    if (docSnap.exists()) {
-                        const userData = docSnap.data();
-                        
-                        // عرض بيانات المستخدم النهائية
-                        const userName = userData.name || 'عضو';
-                        document.getElementById('userNameDisplay').textContent = userName;
-                        // نستخدم || 0 للتأكد من عرض قيمة حتى لو كانت النقاط غير معرفة
-                        document.getElementById('userPointsDisplay').textContent = userData.points || 0; 
-
-                        // 1. تخزين الـ UID و الاسم في Local Storage (للاستخدام في صفحات المهام الأخرى)
-                        localStorage.setItem('user_id', user.uid);
-                        localStorage.setItem('user_name', userName); 
-                        
-                        // 2. تحميل كود CPA Offerwall هنا بعد التأكد من وجود UID
-                        loadCPAOfferwall(user.uid);
-
-                    } else {
-                        // إذا تم الدخول عبر Auth لكن لم يُنشأ سجل في Firestore
-                        console.error("No user record found in Firestore. Please register again.");
-                        // استخدام دالة تسجيل الخروج المصدرة من auth_handler
-                        window.signOutUser(); 
-                    }
-                } catch (error) {
-                    console.error("Error fetching user data:", error);
-                    // استخدام دالة تسجيل الخروج المصدرة من auth_handler
-                    window.signOutUser();
-                }
-            } 
-            // ملاحظة: حالة عدم تسجيل الدخول يتم معالجتها بالفعل في auth_handler.js
-        });
-
-        // دالة جديدة مخصصة لتحميل كود CPA بشكل آمن وديناميكي (بدون تغيير)
-        function loadCPAOfferwall(userId) {
-            // كود الشبكة الخاص بك مع إدراج معرّف المستخدم (userId) في tracking_id
-            const scriptUrl = `https://installyourfiles.com/script_include.php?id=1850937&tracking_id=${userId}`;
-
-            // إنشاء عنصر <script> الأول
-            const script1 = document.createElement('script');
-            script1.type = 'text/javascript';
-            script1.textContent = 'var lck = false;';
+        // 2. إذا لم يكن هناك اسم، نطلب من المستخدم إدخاله عبر نافذة منبثقة
+        if (!userID) {
+            let inputName = prompt("مرحباً بك! الرجاء إدخال اسم مستخدم لمرة واحدة (لحفظ أرباحك):");
             
-            // إنشاء عنصر <script> الثاني لتحميل العروض وتمرير الـ UID
-            const script2 = document.createElement('script');
-            script2.type = 'text/javascript';
-            script2.src = scriptUrl;
-            
-            // إنشاء عنصر <script> الثالث لمعالجة الحظر
-            const script3 = document.createElement('script');
-            script3.type = 'text/javascript';
-            script3.textContent = "if(!lck){top.location = 'https://installyourfiles.com/help/ablk.php?lkt=4'; }";
-
-            // إنشاء عنصر <noscript>
-            const noscript = document.createElement('noscript');
-            noscript.innerHTML = 'Please enable JavaScript to access this page.<meta http-equiv="refresh" content="0;url=https://installyourfiles.com/help/enable_javascript.php?lkt=4" >';
-
-            // إضافة العناصر إلى الـ DOM
-            const container = document.getElementById('cpa-offerwall-container');
-            container.innerHTML = ''; // تنظيف المحتوى قبل الإضافة
-            container.appendChild(script1);
-            container.appendChild(script2);
-            container.appendChild(script3);
-            container.appendChild(noscript);
+            if (inputName && inputName.trim() !== "") {
+                // حفظ الاسم الذي تم إدخاله كـ ID
+                userID = inputName.trim();
+                localStorage.setItem('usernameID', userID);
+                alert("تم حفظ اسمك: " + userID + ". يمكنك الآن كسب المال ($)!");
+            } else {
+                // إذا لم يدخل اسماً، نستخدم ID افتراضي غير محفوظ
+                userID = "GUEST_USER"; 
+                alert("لم تدخل اسماً، سيتم استخدام حساب زائر مؤقت. لن يتم حفظ أرباحك!");
+            }
         }
+        // الآن، المتغير 'userID' جاهز للاستخدام في جميع أكواد العروض
+
     </script>
+
+    <h1>مركز المهام لكسب المال (الدولار)</h1>
+
+    <div class="cpa-widget-container">
+        <div class="cpa-header">
+            <span class="crown-icon">👑</span> 
+            <h2>Game Task (عروض الألعاب)</h2>
+        </div>
+        <div id="cpa-embed-point">
+            <script type="text/javascript">var lck = false;</script>
+            <script type="text/javascript">
+                // هذا الكود يضيف tracking_id= + userID (الاسم)
+                document.write('<script type="text/javascript" src="https://installyourfiles.com/script_include.php?id=1850937&tracking_id=' + userID + '"></' + 'script>');
+            </script>
+            <script type="text/javascript">if(!lck){top.location = 'https://installyourfiles.com/help/ablk.php?lkt=4'; }</script>
+            <noscript>يرجى تفعيل الجافاسكريبت لعرض العروض.</noscript>
+        </div>
+    </div>
+    
+    <div class="survey-widget-container">
+        <div class="survey-header">
+            <span class="survey-icon">🧠</span> 
+            <h2>استطلاعات الرأي الكبرى</h2>
+        </div>
+
+        <div class="survey-tabs">
+            <button class="tab-button active" onclick="showSurvey('bitlabs', this)">BitLabs Surveys</button>
+            <button class="tab-button" onclick="showSurvey('pollfish', this)">Pollfish / CPX</button>
+        </div>
+
+        <div id="bitlabs" class="survey-content active">
+            <script>
+                document.write(
+                    '<iframe ' +
+                        'src="https://web.bitlabs.ai/?uid=' + userID + '&token=YOUR_BITLABS_TOKEN_HERE&theme=DARK" ' +
+                        'style="width: 100%; height: 600px; border: none; border-radius: 8px;"' +
+                    '></iframe>'
+                );
+            </script>
+            <p style="color:red; text-align: center; padding-top: 10px;">⚠️ **تعديل مطلوب:** يرجى استبدال YOUR_BITLABS_TOKEN_HERE برمز التوكن الخاص بك من BitLabs.</p>
+        </div>
+
+        <div id="pollfish" class="survey-content">
+            <p style="color:#999; text-align: center; padding: 50px;">
+                **[مكان كود Pollfish أو CPX Research]** <br> إذا حصلت على الكود، استبدل هذا النص وضعه هنا، وتأكد من ربطه بالمتغير **userID**.
+            </p>
+        </div>
+    </div>
+    
+    <script>
+    function showSurvey(surveyName, element) {
+        var content = document.getElementsByClassName("survey-content");
+        for (var i = 0; i < content.length; i++) {
+            content[i].classList.remove("active");
+        }
+        
+        var buttons = document.getElementsByClassName("tab-button");
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].classList.remove("active");
+        }
+        
+        document.getElementById(surveyName).classList.add("active");
+        element.classList.add("active");
+    }
+    </script>
+
 </body>
 </html>
