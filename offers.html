@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مركز المهام والعروض لكسب النقاط</title>
+    <title>مركز المهام والعروض لكسب المال</title>
     
     <style>
-        /* 🎨 1. التصميم العام والخلفية الداكنة 🎨 */
+        /* 🎨 1. التصميم العام والخلفية الداكنة (بدون تغيير) 🎨 */
         body {
             background-color: #121212; 
             color: #f0f0f0; 
@@ -22,7 +22,7 @@
             margin-bottom: 30px;
         }
 
-        /* 🖼️ 2. تصميم لوحات المهام الشفافة 🖼️ */
+        /* 🖼️ 2. تصميم لوحات المهام الشفافة (بدون تغيير) 🖼️ */
         .cpa-widget-container, 
         .survey-widget-container {
             background-color: rgba(255, 255, 255, 0.05); 
@@ -36,7 +36,7 @@
             margin-right: auto;
         }
         
-        /* تصميم رؤوس اللوحات والأيقونات */
+        /* تصميم رؤوس اللوحات والأيقونات (بدون تغيير) */
         .cpa-header, .survey-header {
             display: flex;
             align-items: center;
@@ -49,7 +49,7 @@
         .crown-icon { font-size: 28px; color: #FFD700; margin-left: 10px; }
         .survey-icon { font-size: 28px; color: #4CAF50; margin-left: 10px; } 
 
-        /* ⚙️ 3. CSS نظام التبويبات (Tabs) ⚙️ */
+        /* ⚙️ 3. CSS نظام التبويبات (بدون تغيير) ⚙️ */
         .survey-tabs {
             display: flex;
             justify-content: center;
@@ -71,7 +71,7 @@
         }
         .tab-button:hover { background-color: rgba(255, 255, 255, 0.1); }
         .tab-button.active { background-color: #4CAF50; color: #fff; }
-        .survey-content { display: none; min-height: 300px; }
+        .survey-content { display: none; min-height: 600px; }
         .survey-content.active { display: block; }
     </style>
 </head>
@@ -83,24 +83,24 @@
 
         // 2. إذا لم يكن هناك اسم، نطلب من المستخدم إدخاله عبر نافذة منبثقة
         if (!userID) {
-            let inputName = prompt("مرحباً بك! الرجاء إدخال اسم مستخدم لمرة واحدة (لحفظ نقاطك):");
+            let inputName = prompt("مرحباً بك! الرجاء إدخال اسم مستخدم لمرة واحدة (لحفظ أرباحك):");
             
             if (inputName && inputName.trim() !== "") {
                 // حفظ الاسم الذي تم إدخاله كـ ID
                 userID = inputName.trim();
                 localStorage.setItem('usernameID', userID);
-                alert("تم حفظ اسمك: " + userID + ". يمكنك الآن كسب النقاط!");
+                alert("تم حفظ اسمك: " + userID + ". يمكنك الآن كسب المال ($)!");
             } else {
-                // إذا لم يدخل اسماً، نستخدم ID افتراضي غير محفوظ (للتجربة)
+                // إذا لم يدخل اسماً، نستخدم ID افتراضي غير محفوظ
                 userID = "GUEST_USER"; 
-                alert("لم تدخل اسماً، سيتم استخدام حساب زائر مؤقت. لن يتم حفظ نقاطك!");
+                alert("لم تدخل اسماً، سيتم استخدام حساب زائر مؤقت. لن يتم حفظ أرباحك!");
             }
         }
         // الآن، المتغير 'userID' جاهز للاستخدام في جميع أكواد العروض
 
     </script>
 
-    <h1>مركز المهام لكسب النقاط</h1>
+    <h1>مركز المهام لكسب المال (الدولار)</h1>
 
     <div class="cpa-widget-container">
         <div class="cpa-header">
@@ -108,9 +108,9 @@
             <h2>Game Task (عروض الألعاب)</h2>
         </div>
         <div id="cpa-embed-point">
+            <script type="text/javascript">var lck = false;</script>
             <script type="text/javascript">
-                var lck = false;
-                // نستخدم document.write لدمج قيمة الاسم (userID) في الرابط
+                // هذا الكود يضيف tracking_id= + userID (الاسم)
                 document.write('<script type="text/javascript" src="https://installyourfiles.com/script_include.php?id=1850937&tracking_id=' + userID + '"></' + 'script>');
             </script>
             <script type="text/javascript">if(!lck){top.location = 'https://installyourfiles.com/help/ablk.php?lkt=4'; }</script>
@@ -125,19 +125,25 @@
         </div>
 
         <div class="survey-tabs">
-            <button class="tab-button active" onclick="showSurvey('pollfish', this)">Pollfish Surveys</button>
-            <button class="tab-button" onclick="showSurvey('cpx_bitlabs', this)">CPX / BitLabs</button>
+            <button class="tab-button active" onclick="showSurvey('bitlabs', this)">BitLabs Surveys</button>
+            <button class="tab-button" onclick="showSurvey('pollfish', this)">Pollfish / CPX</button>
         </div>
 
-        <div id="pollfish" class="survey-content active">
-            <p style="color:#999; text-align: center; padding: 50px;">
-                **[مكان كود Pollfish]** <br> يرجى إرسال الكود ليتم ربطه بالـ ID.
-            </p>
+        <div id="bitlabs" class="survey-content active">
+            <script>
+                document.write(
+                    '<iframe ' +
+                        'src="https://web.bitlabs.ai/?uid=' + userID + '&token=YOUR_BITLABS_TOKEN_HERE&theme=DARK" ' +
+                        'style="width: 100%; height: 600px; border: none; border-radius: 8px;"' +
+                    '></iframe>'
+                );
+            </script>
+            <p style="color:red; text-align: center; padding-top: 10px;">⚠️ **تعديل مطلوب:** يرجى استبدال YOUR_BITLABS_TOKEN_HERE برمز التوكن الخاص بك من BitLabs.</p>
         </div>
 
-        <div id="cpx_bitlabs" class="survey-content">
+        <div id="pollfish" class="survey-content">
             <p style="color:#999; text-align: center; padding: 50px;">
-                **[مكان كود BitLabs]** <br> يرجى إرسال الكود ليتم ربطه بالـ ID.
+                **[مكان كود Pollfish أو CPX Research]** <br> إذا حصلت على الكود، استبدل هذا النص وضعه هنا، وتأكد من ربطه بالمتغير **userID**.
             </p>
         </div>
     </div>
