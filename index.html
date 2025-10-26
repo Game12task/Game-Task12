@@ -1,256 +1,208 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مركز المهام لكسب الدولارات - GameTask</title>
-    <style>
-        /* ---------------------------------------------------- */
-        /* تصميم الخلفية والخطوط */
-        /* ---------------------------------------------------- */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #121212; /* خلفية داكنة جداً */
-            color: #E0E0E0;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #1E1E1E;
-            border-radius: 15px;
-            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.7); /* ظل أقوى */
-        }
-        h1 {
-            color: #64ffda; /* لون أخضر فاتح جذاب */
-            font-size: 26px; /* حجم أكبر قليلاً */
-            margin-bottom: 30px;
-            border-bottom: 2px solid rgba(100, 255, 218, 0.2);
-            padding-bottom: 10px;
-        }
-        /* ---------------------------------------------------- */
-        /* قسم الإدخال وتحديد الهوية */
-        /* ---------------------------------------------------- */
-        .user-input {
-            background-color: #2C2C2C;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            text-align: right;
-            border: 1px solid #64ffda; /* إطار بلون مميز لتركيز المستخدم */
-        }
-        .user-input label {
-            color: #E0E0E0;
-            display: block; /* لضمان أن المدخل يليه في سطر جديد */
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-        .user-input input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: none; /* إزالة الحدود */
-            background-color: #3A3A3A;
-            color: #FFFFFF;
-            box-sizing: border-box;
-            text-align: right;
-            font-size: 16px;
-        }
-        /* ---------------------------------------------------- */
-        /* قسم جدار العروض (CPA Offer Wall) */
-        /* ---------------------------------------------------- */
-        .offer-section {
-            background-color: #2C2C2C;
-            padding: 15px; 
-            border-radius: 10px;
-            margin-bottom: 25px;
-            border: 1px solid #3A3A3A;
-            overflow: hidden; 
-        }
-        .offer-header {
-            color: #FFD700; /* لون ذهبي نقي */
-            font-size: 20px;
-            margin-bottom: 15px;
-            text-align: center;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
-        }
-        #cpa-offer-wall-container {
-            /* نحتاج فقط لعرض الزر */
-            min-height: 100px; 
-            width: 100%;
-        }
-        
-        .open-offerwall-btn {
-            background-color: #64ffda;
-            color: #121212;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: bold;
-            transition: background-color 0.3s;
-            margin-top: 20px;
-        }
-        .open-offerwall-btn:hover {
-            background-color: #00e699;
-        }
-
-        /* ---------------------------------------------------- */
-        /* قسم BitLabs (المغلق) */
-        /* ---------------------------------------------------- */
-        .bitlabs-container {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #2C2C2C;
-            border-radius: 10px;
-            text-align: center;
-            border: 2px dashed #FF5722; /* إطار منقط بلون التنبيه */
-        }
-        .bitlabs-header {
-            color: #bb86fc; 
-            font-size: 18px;
-            margin-bottom: 15px;
-        }
-        .closed-section-message {
-            color: #FF5722;
-            padding: 10px;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        #bitlabs-btn {
-           display: none; 
-        }
-    </style>
-    <script type='text/javascript' src='https://akamaicdn.org/js/offerwall.js'></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مركز المهام لكسب الدولارات - GameTask</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #121212;
+        color: #E0E0E0;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+    }
+    .container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #1E1E1E;
+        border-radius: 15px;
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.7);
+    }
+    h1 {
+        color: #64ffda;
+        font-size: 26px;
+        margin-bottom: 30px;
+        border-bottom: 2px solid rgba(100, 255, 218, 0.2);
+        padding-bottom: 10px;
+    }
+    .user-input {
+        background-color: #2C2C2C;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        text-align: right;
+        border: 1px solid #64ffda;
+    }
+    .user-input label {
+        color: #E0E0E0;
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+    .user-input input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: none;
+        background-color: #3A3A3A;
+        color: #FFFFFF;
+        box-sizing: border-box;
+        text-align: right;
+        font-size: 16px;
+    }
+    .offer-section {
+        background-color: #2C2C2C;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        border: 1px solid #3A3A3A;
+        overflow: hidden;
+    }
+    .offer-header {
+        color: #FFD700;
+        font-size: 20px;
+        margin-bottom: 15px;
+        text-align: center;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+    }
+    #cpa-offer-wall-container {
+        min-height: 100px; 
+        width: 100%;
+    }
+    .open-offerwall-btn {
+        background-color: #64ffda;
+        color: #121212;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: bold;
+        transition: background-color 0.3s;
+        margin-top: 20px;
+    }
+    .open-offerwall-btn:hover {
+        background-color: #00e699;
+    }
+    .bitlabs-container {
+        margin-top: 30px;
+        padding: 20px;
+        background-color: #2C2C2C;
+        border-radius: 10px;
+        text-align: center;
+        border: 2px dashed #FF5722;
+    }
+    .bitlabs-header {
+        color: #bb86fc; 
+        font-size: 18px;
+        margin-bottom: 15px;
+    }
+    .closed-section-message {
+        color: #FF5722;
+        padding: 10px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+    #bitlabs-btn { display: none; }
+</style>
+<script type='text/javascript' src='https://akamaicdn.org/js/offerwall.js'></script>
 </head>
 <body>
 
 <div class="container">
-    <h1>مركز المهام لكسب المال (الدولار)</h1>
+<h1>مركز المهام لكسب المال (الدولار)</h1>
 
-    <div class="user-input">
-        <label for="username-input">الرجاء إدخال اسم المستخدم الخاص بك (مرة واحدة فقط):</label>
-        <input type="text" id="username-input" placeholder="مثال: Ahmad123">
-    </div>
+<div class="user-input">
+    <label for="username-input">الرجاء إدخال اسم المستخدم الخاص بك (مرة واحدة فقط):</label>
+    <input type="text" id="username-input" placeholder="مثال: Ahmad123">
+</div>
 
-    <div class="offer-section">
-        <div class="offer-header">👑 GAME TASK 👑 | مكافآت اللعب بالدولار</div> 
-        <div id="cpa-offer-wall-container">
-            <p style="text-align: center; color: #ffeb3b; padding: 20px;">يرجى إدخال اسم المستخدم أعلاه لفتح جدار العروض.</p>
-        </div>
+<div class="offer-section">
+    <div class="offer-header">👑 GAME TASK 👑 | مكافآت اللعب بالدولار</div> 
+    <div id="cpa-offer-wall-container">
+        <p style="text-align: center; color: #ffeb3b; padding: 20px;">يرجى إدخال اسم المستخدم أعلاه لفتح جدار العروض.</p>
     </div>
-    
-    <div class="bitlabs-container">
-        <div class="bitlabs-header">استطلاعات الرأي الكبرى (BitLabs) 🧠</div>
-        
-        <div class="closed-section-message">
-            قسم الاستطلاعات قيد التحديث والإعداد حالياً. نعتذر للإزعاج!
-        </div>
-        
-        <script>
-            // كود BitLabs SDK (لا يحتاج لتعديل الآن)
-            (function(a,b,c,d){
-                var e = a.createElement(c);
-                e.type = 'text/javascript';
-                e.async = true;
-                e.src = 'https://quiz.bitlabs.ai/js/sdk.js';
-                var f = function(){
-                    BitLabs.init({
-                        token: 'YOUR_BITLABS_TOKEN_HERE', 
-                        uid: localStorage.getItem('userID') || 'guest_user' 
-                    });
-                };
-                if(a.readyState == 'complete'){
-                    f();
-                } else {
-                    b.addEventListener('load', f);
-                }
-                d.parentNode.insertBefore(e,d.nextSibling);
-            })(document, window, 'script', document.scripts[0]);
+</div>
 
-            function openBitLabs() {
-                if (typeof BitLabs !== 'undefined') {
-                    BitLabs.open();
-                } else {
-                    alert('لوحة الاستبيانات غير جاهزة بعد، يرجى المحاولة مرة أخرى.');
-                }
-            }
-        </script>
-        <button id="bitlabs-btn" onclick="openBitLabs()">ابدأ الاستبيانات</button>
+<div class="bitlabs-container">
+    <div class="bitlabs-header">استطلاعات الرأي الكبرى (BitLabs) 🧠</div>
+    <div class="closed-section-message">
+        قسم الاستطلاعات قيد التحديث والإعداد حالياً. نعتذر للإزعاج!
     </div>
+    <script>
+    (function(a,b,c,d){
+        var e = a.createElement(c);
+        e.type = 'text/javascript';
+        e.async = true;
+        e.src = 'https://quiz.bitlabs.ai/js/sdk.js';
+        var f = function(){
+            BitLabs.init({
+                token: 'YOUR_BITLABS_TOKEN_HERE', 
+                uid: localStorage.getItem('userID') || 'guest_user' 
+            });
+        };
+        if(a.readyState == 'complete'){ f(); } else { b.addEventListener('load', f); }
+        d.parentNode.insertBefore(e,d.nextSibling);
+    })(document, window, 'script', document.scripts[0]);
+    function openBitLabs() {
+        if (typeof BitLabs !== 'undefined') { BitLabs.open(); } 
+        else { alert('لوحة الاستبيانات غير جاهزة بعد، يرجى المحاولة مرة أخرى.'); }
+    }
+    </script>
+    <button id="bitlabs-btn" onclick="openBitLabs()">ابدأ الاستبيانات</button>
+</div>
 
 </div>
 
 <script>
-    // 1. معالجة اسم المستخدم وتمريره إلى لوحة العروض
-    const usernameInput = document.getElementById('username-input');
-    const cpaContainer = document.getElementById('cpa-offer-wall-container'); 
+const usernameInput = document.getElementById('username-input');
+const cpaContainer = document.getElementById('cpa-offer-wall-container'); 
+const CPA_OFFERWALL_BID = '4q9Fm'; // رابط DirectCPI أو رقم BID
 
-    // رقم الـ BID (معرّف جدار العروض) لـ CPALead.
-    const CPA_OFFERWALL_BID = '4q9Fm'; 
-    
-    // التحقق من وجود اسم مستخدم محفوظ
-    let currentUserID = localStorage.getItem('userID');
-    if (currentUserID) {
-        usernameInput.value = currentUserID;
+let currentUserID = localStorage.getItem('userID');
+if (currentUserID) {
+    usernameInput.value = currentUserID;
+    usernameInput.disabled = true;
+    showOpenButton(currentUserID); 
+}
+
+usernameInput.addEventListener('change', () => {
+    const newUserID = usernameInput.value.trim();
+    if (newUserID) {
+        localStorage.setItem('userID', newUserID);
         usernameInput.disabled = true;
-        showOpenButton(currentUserID); 
+        showOpenButton(newUserID); 
     }
+});
 
-    usernameInput.addEventListener('change', () => {
-        const newUserID = usernameInput.value.trim();
-        if (newUserID) {
-            localStorage.setItem('userID', newUserID);
-            usernameInput.disabled = true;
-            showOpenButton(newUserID); 
-        }
-    });
-
-    /**
-     * وظيفة لعرض زر "فتح العروض" بعد إدخال اسم المستخدم
-     * @param {string} userID - اسم المستخدم الفريد
-     */
-    function showOpenButton(userID) {
-        cpaContainer.innerHTML = `
-            <button class="open-offerwall-btn" onclick="openCPAOfferwall('${userID}')">
-                اضغط هنا لفتح المهام 🚀
-            </button>
-        `;
-        
-        // تحديث كود BitLabs أيضاً (لضمان ربط الـ UID بشكل صحيح)
-        if (typeof BitLabs !== 'undefined') {
-             BitLabs.init({
-                token: 'YOUR_BITLABS_TOKEN_HERE', 
-                uid: userID 
-            });
-        }
+function showOpenButton(userID) {
+    cpaContainer.innerHTML = `
+        <button class="open-offerwall-btn" onclick="openCPAOfferwall('${userID}')">
+            اضغط هنا لفتح المهام 🚀
+        </button>
+    `;
+    if (typeof BitLabs !== 'undefined') {
+         BitLabs.init({
+            token: 'YOUR_BITLABS_TOKEN_HERE', 
+            uid: userID 
+        });
     }
-    
-    /**
-     * وظيفة فتح جدار العروض في نافذة جديدة (تحل مشكلة التوجيه 100%)
-     * @param {string} userID - اسم المستخدم الفريد
-     */
-    function openCPAOfferwall(userID) {
-        // نتحقق من وجود الدالة ثم نستخدمها لفتح النافذة الجديدة
-        if (typeof cpid_run !== 'undefined') {
-            cpid_run(CPA_OFFERWALL_BID, userID);
-        } else {
-            alert('نظام المهام لم يتم تحميله بعد، يرجى تحديث الصفحة والمحاولة مجدداً.');
-        }
-    }
+}
 
-
-    // 2. تفعيل التتبع عند تحميل الصفحة
-    if (currentUserID) {
-        showOpenButton(currentUserID);
+function openCPAOfferwall(userID) {
+    if (typeof cpid_run !== 'undefined') {
+        cpid_run(CPA_OFFERWALL_BID, userID);
+    } else {
+        alert('نظام المهام لم يتم تحميله بعد، يرجى تحديث الصفحة والمحاولة مجدداً.');
     }
+}
+
+if (currentUserID) { showOpenButton(currentUserID); }
 </script>
 
 </body>
-    </html>
-    
+</html>
