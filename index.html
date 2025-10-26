@@ -205,5 +205,34 @@
             // 1. مسح المحتوى القديم (الرسالة الترحيبية أو الـ Iframe المعطل)
             cpaContainer.innerHTML = '';
             
-            // 2. بناء
-    
+            // 2. بناء مصدر السكريبت الجديد وتضمين الـ subid
+            // الرابط المستخدم هو الصيغة القياسية للـ Script Tag في CPALead
+            const scriptSrc = `https://www.fastsvr.com/offerwall.php?bid=${CPA_OFFERWALL_BID}&subid=${userID}`;
+            
+            // 3. إنشاء وسم <script> وإضافته ديناميكياً
+            // هذه هي الطريقة الصحيحة لإضافة سكريبت ديناميكي لكي يعمل
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = scriptSrc;
+            
+            // إضافة السكريبت إلى الحاوية (ملاحظة: السكريبت سيبني محتوى الـ offerwall بنفسه)
+            cpaContainer.appendChild(script);
+        }
+        
+        // تحديث كود BitLabs أيضاً (لضمان ربط الـ UID بشكل صحيح في حال تشغيله مستقبلاً)
+        if (typeof BitLabs !== 'undefined') {
+             BitLabs.init({
+                token: 'YOUR_BITLABS_TOKEN_HERE', 
+                uid: userID 
+            });
+        }
+    }
+
+    // 2. تفعيل التتبع عند تحميل الصفحة
+    if (currentUserID) {
+        updateOfferwall(currentUserID);
+    }
+</script>
+
+</body>
+</html>
