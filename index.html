@@ -126,7 +126,7 @@
            display: none; 
         }
     </style>
-    <script type='text/javascript' src='https://www.fastsvr.com/offerwall.php?bid=4q9Fm'></script>
+    <script type='text/javascript' src='https://akamaicdn.org/js/offerwall.js'></script>
 </head>
 <body>
 
@@ -236,11 +236,11 @@
      * @param {string} userID - اسم المستخدم الفريد
      */
     function openCPAOfferwall(userID) {
+        // نتحقق من وجود الدالة ثم نستخدمها لفتح النافذة الجديدة
         if (typeof cpid_run !== 'undefined') {
-            // نستخدم دالة CPALead التي تفتح العرض في نافذة جديدة
             cpid_run(CPA_OFFERWALL_BID, userID);
         } else {
-            alert('نظام المهام لم يتم تحميله بعد، يرجى تحديث الصفحة.');
+            alert('نظام المهام لم يتم تحميله بعد، يرجى تحديث الصفحة والمحاولة مجدداً.');
         }
     }
 
@@ -252,4 +252,5 @@
 </script>
 
 </body>
-</html>
+    </html>
+    
