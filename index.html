@@ -64,11 +64,12 @@
         /* ---------------------------------------------------- */
         .offer-section {
             background-color: #2C2C2C;
-            padding: 15px 0; /* تقليل padding الداخلي ليملأ ال iframe المساحة */
+            padding: 15px; /* تقليل padding الداخلي */
             border-radius: 10px;
             margin-bottom: 25px;
             border: 1px solid #3A3A3A;
-            overflow: hidden; /* لمنع أي سكرول غير مرغوب فيه */
+            /* يجب أن يكون الـ overflow: visible للسماح للـ Script Tag بالعمل */
+            overflow: visible; 
         }
         .offer-header {
             color: #FFD700; /* لون ذهبي نقي */
@@ -78,10 +79,11 @@
             padding-bottom: 10px;
             border-bottom: 1px solid rgba(255, 215, 0, 0.2);
         }
-        /* تعديل جديد للحاوية التي تحمل جدار العروض لضمان عرض كامل */
+        /* تعديل جديد للحاوية لترك السكريبت يرسم الجدار */
         #cpa-offer-wall-container {
-            /* سنعتمد على ارتفاع الـ iframe الداخلي، لكن هذا ارتفاع افتراضي */
-            min-height: 400px; 
+            /* سنعتمد على ارتفاع الـ Script Tag */
+            min-height: 700px; 
+            width: 100%;
         }
 
         /* ---------------------------------------------------- */
@@ -174,9 +176,8 @@
     const usernameInput = document.getElementById('username-input');
     const cpaContainer = document.getElementById('cpa-offer-wall-container'); 
 
-    // رابط جدار عروض CPALead الأساسي
-    // 🚨 تأكد أن هذا هو رابط جدار العروض الذي حصلت عليه
-    const CPA_OFFERWALL_BASE_URL = 'https://akamaicdn.org/list/4q9Fm'; 
+    // رقم الـ BID (معرّف جدار العروض) لـ CPALead.
+    const CPA_OFFERWALL_BID = '4q9Fm'; 
     
     // التحقق من وجود اسم مستخدم محفوظ
     let currentUserID = localStorage.getItem('userID');
@@ -196,41 +197,13 @@
     });
 
     /**
-     * وظيفة تحديث جدار العروض بإضافة اسم المستخدم (subID)
+     * وظيفة تحديث جدار العروض باستخدام Script Tag (لحل مشكلة التوجيه)
      * @param {string} userID - اسم المستخدم الفريد
      */
     function updateOfferwall(userID) {
         if (cpaContainer) {
-            // منطق بناء الرابط: نستخدم علامة '?' إذا لم تكن موجودة في الرابط الأساسي
-            const separator = CPA_OFFERWALL_BASE_URL.includes('?') ? '&' : '?';
-            const offerwallSrc = `${CPA_OFFERWALL_BASE_URL}${separator}subid=${userID}`;
+            // 1. مسح المحتوى القديم (الرسالة الترحيبية أو الـ Iframe المعطل)
+            cpaContainer.innerHTML = '';
             
-            // إنشاء كود Iframe الجديد وتضمينه في الحاوية
-            const iframeCode = `
-                <iframe 
-                    sandbox='allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox' 
-                    src='${offerwallSrc}' 
-                    style='width:100%; height:690px; border:none; display:block;' 
-                    frameborder='0'>
-                </iframe>
-            `;
-            cpaContainer.innerHTML = iframeCode;
-        }
-        
-        // تحديث كود BitLabs أيضاً (لضمان ربط الـ UID بشكل صحيح في حال تشغيله مستقبلاً)
-        if (typeof BitLabs !== 'undefined') {
-             BitLabs.init({
-                token: 'YOUR_BITLABS_TOKEN_HERE', 
-                uid: userID 
-            });
-        }
-    }
-
-    // 2. تفعيل التتبع عند تحميل الصفحة
-    if (currentUserID) {
-        updateOfferwall(currentUserID);
-    }
-</script>
-
-</body>
-</html>
+            // 2. بناء
+    
