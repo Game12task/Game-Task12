@@ -64,12 +64,11 @@
         /* ---------------------------------------------------- */
         .offer-section {
             background-color: #2C2C2C;
-            padding: 15px; /* تقليل padding الداخلي */
+            padding: 15px 0; /* تقليل padding الداخلي ليملأ ال iframe المساحة */
             border-radius: 10px;
             margin-bottom: 25px;
             border: 1px solid #3A3A3A;
-            /* الآن يجب أن يكون overflow: visible للسماح للسكريبت بالرسم */
-            overflow: visible; 
+            overflow: hidden; /* لمنع أي سكرول غير مرغوب فيه */
         }
         .offer-header {
             color: #FFD700; /* لون ذهبي نقي */
@@ -79,11 +78,10 @@
             padding-bottom: 10px;
             border-bottom: 1px solid rgba(255, 215, 0, 0.2);
         }
-        /* تعديل جديد للحاوية لترك السكريبت يرسم الجدار */
+        /* تعديل جديد للحاوية التي تحمل جدار العروض لضمان عرض كامل */
         #cpa-offer-wall-container {
-            /* سنعتمد على ارتفاع السكريبت، لكن هذا ارتفاع افتراضي للتأكد من وجود مساحة */
-            min-height: 700px; 
-            width: 100%;
+            /* سنعتمد على ارتفاع الـ iframe الداخلي، لكن هذا ارتفاع افتراضي */
+            min-height: 400px; 
         }
 
         /* ---------------------------------------------------- */
@@ -176,8 +174,9 @@
     const usernameInput = document.getElementById('username-input');
     const cpaContainer = document.getElementById('cpa-offer-wall-container'); 
 
-    // رقم الـ BID (معرّف جدار العروض) لـ CPALead.
-    const CPA_OFFERWALL_BID = '4q9Fm'; 
+    // رابط جدار عروض CPALead الأساسي
+    // 🚨 تأكد أن هذا هو رابط جدار العروض الذي حصلت عليه
+    const CPA_OFFERWALL_BASE_URL = 'https://akamaicdn.org/list/4q9Fm'; 
     
     // التحقق من وجود اسم مستخدم محفوظ
     let currentUserID = localStorage.getItem('userID');
@@ -197,22 +196,25 @@
     });
 
     /**
-     * وظيفة تحديث جدار العروض باستخدام Script Tag (لحل مشكلة التوجيه)
+     * وظيفة تحديث جدار العروض بإضافة اسم المستخدم (subID)
      * @param {string} userID - اسم المستخدم الفريد
      */
     function updateOfferwall(userID) {
         if (cpaContainer) {
-            // 1. مسح المحتوى القديم (لضمان تحميل العروض الجديدة بشكل سليم)
-            cpaContainer.innerHTML = '';
+            // منطق بناء الرابط: نستخدم علامة '?' إذا لم تكن موجودة في الرابط الأساسي
+            const separator = CPA_OFFERWALL_BASE_URL.includes('?') ? '&' : '?';
+            const offerwallSrc = `${CPA_OFFERWALL_BASE_URL}${separator}subid=${userID}`;
             
-            // 2. بناء كود السكريبت مباشرة باستخدام innerHTML (الطريقة الأكثر موثوقية)
-            // هذا الكود هو المسؤول عن إظهار جدار العروض
-            const scriptCode = `
-                <script type="text/javascript" src="https://www.fastsvr.com/offerwall.php?bid=${CPA_OFFERWALL_BID}&subid=${userID}"></script>
+            // إنشاء كود Iframe الجديد وتضمينه في الحاوية
+            const iframeCode = `
+                <iframe 
+                    sandbox='allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox' 
+                    src='${offerwallSrc}' 
+                    style='width:100%; height:690px; border:none; display:block;' 
+                    frameborder='0'>
+                </iframe>
             `;
-            
-            // 3. إدراج كود السكريبت
-            cpaContainer.innerHTML = scriptCode;
+            cpaContainer.innerHTML = iframeCode;
         }
         
         // تحديث كود BitLabs أيضاً (لضمان ربط الـ UID بشكل صحيح في حال تشغيله مستقبلاً)
@@ -231,4 +233,4 @@
 </script>
 
 </body>
-</html>
+</html>        
