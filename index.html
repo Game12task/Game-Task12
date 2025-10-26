@@ -68,7 +68,7 @@
             border-radius: 10px;
             margin-bottom: 25px;
             border: 1px solid #3A3A3A;
-            /* يجب أن يكون الـ overflow: visible للسماح للـ Script Tag بالعمل */
+            /* الآن يجب أن يكون overflow: visible للسماح للسكريبت بالرسم */
             overflow: visible; 
         }
         .offer-header {
@@ -81,7 +81,7 @@
         }
         /* تعديل جديد للحاوية لترك السكريبت يرسم الجدار */
         #cpa-offer-wall-container {
-            /* سنعتمد على ارتفاع الـ Script Tag */
+            /* سنعتمد على ارتفاع السكريبت، لكن هذا ارتفاع افتراضي للتأكد من وجود مساحة */
             min-height: 700px; 
             width: 100%;
         }
@@ -202,21 +202,17 @@
      */
     function updateOfferwall(userID) {
         if (cpaContainer) {
-            // 1. مسح المحتوى القديم (الرسالة الترحيبية أو الـ Iframe المعطل)
+            // 1. مسح المحتوى القديم (لضمان تحميل العروض الجديدة بشكل سليم)
             cpaContainer.innerHTML = '';
             
-            // 2. بناء مصدر السكريبت الجديد وتضمين الـ subid
-            // الرابط المستخدم هو الصيغة القياسية للـ Script Tag في CPALead
-            const scriptSrc = `https://www.fastsvr.com/offerwall.php?bid=${CPA_OFFERWALL_BID}&subid=${userID}`;
+            // 2. بناء كود السكريبت مباشرة باستخدام innerHTML (الطريقة الأكثر موثوقية)
+            // هذا الكود هو المسؤول عن إظهار جدار العروض
+            const scriptCode = `
+                <script type="text/javascript" src="https://www.fastsvr.com/offerwall.php?bid=${CPA_OFFERWALL_BID}&subid=${userID}"></script>
+            `;
             
-            // 3. إنشاء وسم <script> وإضافته ديناميكياً
-            // هذه هي الطريقة الصحيحة لإضافة سكريبت ديناميكي لكي يعمل
-            const script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.src = scriptSrc;
-            
-            // إضافة السكريبت إلى الحاوية (ملاحظة: السكريبت سيبني محتوى الـ offerwall بنفسه)
-            cpaContainer.appendChild(script);
+            // 3. إدراج كود السكريبت
+            cpaContainer.innerHTML = scriptCode;
         }
         
         // تحديث كود BitLabs أيضاً (لضمان ربط الـ UID بشكل صحيح في حال تشغيله مستقبلاً)
