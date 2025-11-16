@@ -44,7 +44,8 @@
 
 <script>
     // ********* 1. رابط API الحقيقي الذي تم نشره بنجاح *********
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxxNL_pYhNfNak9DL6Zj3sVgENzeOvP1XaKgIke5_1_k5aCVnpwlntZY-0ilu8-7y6t/exec';
+    // تم التحديث بالرابط الذي أرسلته
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxmDHN3dvEVXkTqhBHqF0PPiG6o-mJ-mlRlHkvfBIg3gs7UJ_uF3Iq7i5kh6Bx8F6oF2w/exec';
     // *********************************************************
     
     const usernameInput = document.getElementById('username-input');
@@ -69,6 +70,7 @@
             }
         } catch (error) {
             console.error('Error fetching balance:', error);
+            // لاحظ: إذا ظهر "خطأ اتصال" الآن، فالمشكلة في دالة doGet نفسها في Apps Script، وليس في الرابط.
             balanceDisplay.textContent = 'خطأ اتصال';
         }
     }
