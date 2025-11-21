@@ -1,184 +1,71 @@
-// auth_handler.js - ملف التعامل مع مصادقة Firebase (التسجيل، الدخول، الخروج)
+// ** 1. إعداد رابط API (الرابط الصحيح المُستخرج من صورتك) **
+const API_URL = 'https://script.google.com/macros/s/AKfycbxI8xsgrEcUBmLE23eQljI4C_KmQniwAsQzYjUICXUkHa7haIIycvw56Gg6LiKv3y2fNw/exec';
 
-// =======================================================
-// متطلبات التشغيل (استيراد الدوال والخدمات من firebase_config.js)
-// =======================================================
-import { auth, db } from "./firebase_config.js"; 
-import { 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword, 
-    signOut,
-    onAuthStateChanged 
-} from "firebase/auth";
-import { 
-    doc, 
-    setDoc, 
-    updateDoc,
-    serverTimestamp,
-    getDoc 
-} from "firebase/firestore";
 
-// =======================================================
-// دوال المساعدة للواجهة
-// =======================================================
-const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
-const authMessage = document.getElementById('authMessage');
-const logoutButton = document.getElementById('logoutButton');
-
-function displayMessage(message, isError = true) {
-    if (authMessage) {
-        authMessage.textContent = message;
-        authMessage.style.color = isError ? 'red' : 'green';
-    }
-}
-
-// دالة تحديث واجهة المستخدم بالـ ID والنقاط
-function updateUI(user) {
-    const userIdDisplay = document.getElementById('userIdDisplay');
-    if (userIdDisplay) {
-        // عرض الـ UID كاملاً
-        userIdDisplay.textContent = user ? user.uid : 'غير مسجل';
+// ** 2. وظيفة تسجيل مستخدم جديد (Register) **
+async function registerUser(name) {
+    if (!name) {
+        return { status: 'error', message: 'الرجاء إدخال اسم المستخدم.' };
     }
 
-    // استدعاء دالة تحميل النقاط والمهام من tasks_handler إذا كانت موجودة
-    if (user && window.loadUserTasksAndPoints) {
-        window.loadUserTasksAndPoints(user.uid);
-    }
-}
+    try {
+        const url = `${API_URL}?action=addUser&name=${encodeURIComponent(name)}`;
+        const response = await fetch(url);
+        const data = await response.json();
 
-// =======================================================
-// 1. دالة إنشاء سجل النقاط في Firestore
-// =======================================================
-async function createNewUserRecord(user, userName) {
-    const userRef = doc(db, "users", user.uid);
-    
-    // إنشاء سجل المستخدم بالاسم الذي أدخله
-    return await setDoc(userRef, {
-        id: user.uid,
-        name: userName,
-        email: user.email,
-        points: 0, // النقاط الأولية
-        lastLogin: serverTimestamp(),
-        createdAt: serverTimestamp()
-    });
-}
-
-// =======================================================
-// 2. دالة إنشاء حساب جديد (التسجيل)
-// =======================================================
-if (registerForm) {
-    registerForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('registerEmail')?.value;
-        const password = document.getElementById('registerPassword')?.value;
-        const userName = document.getElementById('registerName')?.value; 
-        
-        displayMessage('جاري إنشاء الحساب...', false);
-
-        try {
-            // 1. إنشاء المستخدم في Firebase Auth
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-            
-            // 2. إنشاء سجل النقاط في Firestore
-            await createNewUserRecord(user, userName);
-            
-            displayMessage('تم إنشاء الحساب بنجاح! سيتم تحويلك.', false);
-            
-            // 3. التحويل الفوري بعد النجاح إلى index.html
-            setTimeout(() => {
-                window.location.href = 'index.html'; 
-            }, 1000); 
-
-        } catch (error) {
-            displayMessage(`خطأ في التسجيل: ${error.message}`, true);
+        if (data.status === 'success') {
+            localStorage.setItem('game_user_id', data.ID);
+            localStorage.setItem('game_username', name);
+            window.location.href = 'index.html';
+            return { status: 'success', message: 'تم التسجيل بنجاح.' };
+        } else {
+            return { status: 'error', message: data.message || 'خطأ في عملية التسجيل.' };
         }
-    });
+    } catch (error) {
+        console.error('Registration Error:', error);
+        return { status: 'error', message: 'حدث خطأ في الاتصال بالخادم.' };
+    }
 }
 
-// =======================================================
-// 3. دالة تسجيل الدخول
-// =======================================================
-if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('loginEmail')?.value;
-        const password = document.getElementById('loginPassword')?.value;
 
-        displayMessage('جاري تسجيل الدخول...', false);
+// ** 3. وظيفة تسجيل الدخول (Login) **
+async function loginUser(name) {
+    if (!name) {
+        return { status: 'error', message: 'الرجاء إدخال اسم المستخدم.' };
+    }
 
-        try {
-            // 1. تسجيل الدخول في Firebase Auth
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
+    try {
+        const url = `${API_URL}?action=findUser&name=${encodeURIComponent(name)}`;
+        const response = await fetch(url);
+        const data = await response.json();
 
-            // 2. تحديث تاريخ آخر دخول في قاعدة البيانات 
-            const userRef = doc(db, "users", user.uid);
-            await updateDoc(userRef, {
-                lastLogin: serverTimestamp()
-            });
-            
-            displayMessage('تم تسجيل الدخول بنجاح! سيتم تحويلك.', false);
-            
-            // 3. التحويل الفوري بعد النجاح إلى index.html
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1000);
-
-        } catch (error) {
-            displayMessage(`خطأ في الدخول: ${error.message}`, true);
+        if (data.status === 'success') {
+            localStorage.setItem('game_user_id', data.ID);
+            localStorage.setItem('game_username', name);
+            window.location.href = 'index.html';
+            return { status: 'success', message: 'تم تسجيل الدخول بنجاح.' };
+        } else {
+            return { status: 'error', message: data.message || 'خطأ: لم يتم العثور على اسم المستخدم.' };
         }
-    });
+    } catch (error) {
+        console.error('Login Error:', error);
+        return { status: 'error', message: 'حدث خطأ في الاتصال بالخادم.' };
+    }
 }
 
-// =======================================================
-// 4. دالة تسجيل الخروج
-// =======================================================
-if (logoutButton) {
-    logoutButton.addEventListener('click', async () => {
-        try {
-            await signOut(auth);
-            console.log("User signed out.");
+
+// ** 4. وظيفة التحقق من حالة الدخول (لحماية الصفحات) **
+function checkAuthAndRedirect() {
+    const userID = localStorage.getItem('game_user_id');
+    const currentPage = window.location.pathname.split('/').pop();
+
+    if (!userID) {
+        if (currentPage !== 'login.html') {
             window.location.href = 'login.html';
-        } catch (error) {
-            console.error("Error signing out:", error);
-            displayMessage("حدث خطأ أثناء تسجيل الخروج. حاول مرة أخرى.", true); 
         }
-    });
-}
-
-
-// =======================================================
-// 5. التحقق من حالة المصادقة وتأمين الصفحات
-// =======================================================
-// هذه الدالة تعمل على مدار عمر التطبيق لتحديث حالة المستخدم والتحويل عند اللزوم
-onAuthStateChanged(auth, (user) => {
-    const isLoginPage = window.location.pathname.includes('login.html');
-    const isIndexPage = window.location.pathname.includes('index.html') || window.location.pathname === '/';
-
-    if (user) {
-        // المستخدم مسجل دخوله 
-        console.log("User is logged in. UID:", user.uid);
-        updateUI(user);
-        
-        // إذا كان في صفحة الدخول وهو مسجل، نوجّهه إلى الصفحة الرئيسية
-        if (isLoginPage) {
-            window.location.href = 'index.html'; 
-        }
-
     } else {
-        // المستخدم غير مسجل دخوله
-        console.log("User is logged out.");
-        updateUI(null);
-        
-        // إذا كان في الصفحة الرئيسية وهو غير مسجل، نوجّهه إلى صفحة الدخول (تأمين الصفحة)
-        if (isIndexPage) { 
-            window.location.href = 'login.html';
+        if (currentPage === 'login.html') {
+            window.location.href = 'index.html';
         }
     }
-});
-
-
-// تصدير دالة تحديث الواجهة لتستخدم في ملفات أخرى
-export { updateUI };
+}
