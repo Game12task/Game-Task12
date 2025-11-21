@@ -5,69 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسجيل الدخول / التسجيل</title>
     <style>
-        /* تصميم بسيط ليظهر الشكل العام، يمكنك استبداله لاحقاً بملف CSS خارجي */
-        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f4f4f9; }
-        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); width: 350px; text-align: center; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; }
-        button:hover { background-color: #0056b3; }
-        #authMessage.success { color: green; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin:0; padding:20px; text-align:center;}
+        .login-container { max-width: 400px; margin: 50px auto; padding: 30px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);}
+        h2 { color: #007bff; margin-bottom: 25px; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px;}
+        input[type="text"] { 
+            width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; 
+            border-radius: 6px; box-sizing: border-box; font-size: 16px; 
+            text-align: right; 
+        }
+        button { 
+            background-color: #28a745; color: white; padding: 12px 20px; 
+            border: none; border-radius: 6px; cursor: pointer; 
+            width: 100%; margin-top: 15px; font-size: 16px; font-weight: bold; 
+            transition: background-color 0.3s;
+        }
+        button:hover { background-color: #1e7e34;}
+        #message { margin-top: 20px; font-weight: bold;}
+        .switch-mode { margin-top: 20px; font-size: 0.9em; cursor: pointer; color: #007bff;}
     </style>
+    <script src="auth_handler.js"></script> 
 </head>
 <body>
-    <div class="container">
-        <h1>مرحباً بك!</h1>
-        
-        <div id="login-form-container">
-            <h2>تسجيل الدخول</h2>
-            <form id="loginForm"> 
-                <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" required>
-                <input type="password" id="loginPassword" placeholder="كلمة المرور" required>
-                <button type="submit" id="loginBtn">دخول</button>
-            </form>
-            <p>لا تملك حساباً؟ <a href="#" id="showRegister">سجّل الآن</a></p>
-        </div>
 
-        <div id="register-form-container" style="display:none;">
-            <h2>إنشاء حساب جديد</h2>
-            <form id="registerForm"> 
-                <input type="text" id="registerName" placeholder="اسم المستخدم" required>
-                <input type="email" id="registerEmail" placeholder="البريد الإلكتروني" required>
-                <input type="password" id="registerPassword" placeholder="كلمة المرور (6 أحرف أو أكثر)" required>
-                <button type="submit" id="registerBtn">تسجيل</button>
-            </form>
-            <p>لديك حساب بالفعل؟ <a href="#" id="showLogin">تسجيل الدخول</a></p>
-        </div>
-
-        <p id="authMessage" style="margin-top: 10px;"></p>
-    </div>
-
-    <script type="module" src="auth_handler.js"></script>
+<div class="login-container">
+    <h2>تسجيل الدخول</h2>
     
-    <script>
-        const showRegisterLink = document.getElementById('showRegister');
-        const showLoginLink = document.getElementById('showLogin');
-        const loginContainer = document.getElementById('login-form-container');
-        const registerContainer = document.getElementById('register-form-container');
-        const authMessage = document.getElementById('authMessage');
+    <input type="text" id="username" placeholder="اسم المستخدم (Username)">
+    
+    <button id="auth-btn">تسجيل الدخول</button>
+    
+    <p id="message"></p>
+    
+    <p class="switch-mode" id="switch-link">هل ليس لديك حساب؟ اضغط للتسجيل</p>
+</div>
 
-        // دالة التبديل بين نماذج الدخول والتسجيل
-        if (showRegisterLink && showLoginLink) {
-            
-            showRegisterLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                loginContainer.style.display = 'none';
-                registerContainer.style.display = 'block';
-                authMessage.textContent = ''; // مسح الرسالة عند التبديل
-            });
+<script>
+    // ** 1. التحقق من حالة الدخول فور تحميل الصفحة **
+    // إذا كان المستخدم لديه ID بالفعل، سيتم توجيهه إلى index.html
+    checkAuthAndRedirect();
 
-            showLoginLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                registerContainer.style.display = 'none';
-                loginContainer.style.display = 'block';
-                authMessage.textContent = ''; // مسح الرسالة عند التبديل
-            });
+    const usernameInput = document.getElementById('username');
+    const authBtn = document.getElementById('auth-btn');
+    const messageDisplay = document.getElementById('message');
+    const switchLink = document.getElementById('switch-link');
+    
+    // الحالة الافتراضية: تسجيل الدخول
+    let isRegisterMode = false;
+
+    // ** 2. وظيفة تبديل الوضع (تسجيل دخول / تسجيل) **
+    switchLink.addEventListener('click', () => {
+        isRegisterMode = !isRegisterMode;
+        messageDisplay.textContent = ''; // مسح الرسالة
+        
+        if (isRegisterMode) {
+            document.querySelector('h2').textContent = 'إنشاء حساب جديد';
+            authBtn.textContent = 'إنشاء حساب وتسجيل الدخول';
+            authBtn.style.backgroundColor = '#dc3545'; // لون مختلف للتسجيل
+            switchLink.textContent = 'لديك حساب بالفعل؟ اضغط لتسجيل الدخول';
+        } else {
+            document.querySelector('h2').textContent = 'تسجيل الدخول';
+            authBtn.textContent = 'تسجيل الدخول';
+            authBtn.style.backgroundColor = '#28a745'; // لون الدخول
+            switchLink.textContent = 'هل ليس لديك حساب؟ اضغط للتسجيل';
         }
-    </script>
+    });
+
+    // ** 3. وظيفة الضغط على الزر **
+    authBtn.addEventListener('click', async () => {
+        const name = usernameInput.value.trim();
+        let result;
+
+        messageDisplay.textContent = 'جاري المعالجة...';
+
+        if (isRegisterMode) {
+            // تنفيذ وظيفة التسجيل من auth_handler.js
+            result = await registerUser(name);
+        } else {
+            // تنفيذ وظيفة تسجيل الدخول من auth_handler.js
+            result = await loginUser(name);
+        }
+
+        messageDisplay.textContent = result.message;
+        messageDisplay.style.color = result.status === 'success' ? '#28a745' : '#dc3545';
+        
+        // إذا كان نجاح، سيقوم registerUser/loginUser بالتوجيه إلى index.html
+    });
+
+    // لتبسيط العملية: يمكن للمستخدم الضغط على Enter
+    usernameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            authBtn.click();
+        }
+    });
+</script>
+
 </body>
 </html>
