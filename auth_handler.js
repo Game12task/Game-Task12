@@ -1,5 +1,6 @@
-// ** 1. إعداد رابط API (الرابط الصحيح المُستخرج من صورتك) **
-const API_URL = 'https://script.google.com/macros/s/AKfycbxI8xsgrEcUBmLE23eQljI4C_KmQniwAsQzYjUICXUkHa7haIIycvw56Gg6LiKv3y2fNw/exec';
+// ** 1. إعداد رابط API (الرابط الصحيح والنهائي من جوجل) **
+// الرابط الجديد: https://script.google.com/macros/s/AKfycbyI2G_WGjWfwrVG2NcEk1M7WOHer1lXdXsqpQA3XaHepDGwKjNwilyFgXwgTnErgvOoCQ/exec
+const API_URL = 'https://script.google.com/macros/s/AKfycbyI2G_WGjWfwrVG2NcEk1M7WOHer1lXdXsqpQA3XaHepDGwKjNwilyFgXwgTnErgvOoCQ/exec';
 
 
 // ** 2. وظيفة تسجيل مستخدم جديد (Register) **
