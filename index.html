@@ -19,7 +19,7 @@
         .logout-btn { background-color: #dc3545; color: white; padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin-top: 15px; transition: background-color 0.3s; }
         .logout-btn:hover { background-color: #c82333; }
     </style>
-    <script src="auth_handler.js"></script>
+    <script src="auth_handler.js"></script> 
 </head>
 <body>
 
@@ -47,15 +47,15 @@
 
 <script>
     // ** 1. التحقق من حالة الدخول فوراً والـ API URL **
-    checkAuthAndRedirect();
+    checkAuthAndRedirect(); // وظيفة موجودة في auth_handler.js
 
-    // رابط API الصحيح والنهائي (من الرد السابق)
+    // رابط API الصحيح والنهائي
     const API_URL = 'https://script.google.com/macros/s/AKfycbyI2G_WGjWfwrVG2NcEk1M7WOHer1lXdXsqpQA3XaHepDGwKjNwilyFgXwgTnErgvOoCQ/exec';
     
-    // ID جدار العروض CPX Research (الذي يظهر في صورتك)
+    // ID جدار العروض CPX Research (استخدم القيمة التي وضعتها في الكود السابق)
     const APP_ID = '30033'; 
 
-    // جلب بيانات المستخدم المخزنة
+    // جلب بيانات المستخدم المخزنة (المتغيرات التي تم الاتفاق عليها)
     const userID = localStorage.getItem('game_user_id');
     const username = localStorage.getItem('game_username');
     
@@ -67,7 +67,7 @@
         document.getElementById('username-display').textContent = username;
         document.getElementById('user-id-display').textContent = userID;
 
-        // رابط جدار CPX Research المصحح (يرسل ID المستخدم والاسم)
+        // رابط جدار CPX Research المصحح: يمرر ID المستخدم والاسم فقط (بدون الهاش الأمني المعقد)
         const offerwallSrc = `https://offers.cpx-research.com/index.php?app_id=${APP_ID}&ext_user_id=${userID}&username=${encodeURIComponent(username)}`;
 
         const iframeCode = `
@@ -108,6 +108,7 @@
     function logout() {
         localStorage.removeItem('game_user_id');
         localStorage.removeItem('game_username');
+        // هنا يمكن إضافة مسح أي بيانات أخرى إذا لزم الأمر
         window.location.href = 'login.html';
     }
 </script>
