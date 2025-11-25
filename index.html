@@ -3,112 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مركز المهام لكسب الدولارات - GameTask</title>
+    <title>مركز الروابط والمكافآت</title>
     <style>
-        /* CSS الخاص بك تم الاحتفاظ به مع تعديلات بسيطة للثبات */
+        /* الحفاظ على التصميم الداكن الذي أرسلته */
         body { font-family: Arial, sans-serif; background-color: #121212; color: #E0E0E0; margin:0; padding:0; text-align:center;}
-        .container { max-width:600px; margin:50px auto; padding:20px; background-color:#1E1E1E; border-radius:15px; box-shadow:0 4px 25px rgba(0,0,0,0.7);}
+        .container { max-width:600px; margin:50px auto; padding:30px; background-color:#1E1E1E; border-radius:15px; box-shadow:0 4px 25px rgba(0,0,0,0.7);}
         h1 { color:#64ffda; font-size:26px; margin-bottom:20px; border-bottom:2px solid rgba(100,255,218,0.2); padding-bottom:10px;}
         .user-info { background-color:#2C2C2C; padding:20px; border-radius:10px; margin-bottom:25px; text-align:right; border:1px solid #64ffda;}
-        .balance-section { background-color:#333333; padding:15px; border-radius:10px; margin-bottom:25px; text-align:center; border:2px solid #FFD700;}
-        .balance-section p { margin:0; font-size:18px; color:#FFD700;}
-        #balance-display { font-size:32px; font-weight:bold; color:#00FF7F; margin-top:5px;}
-        .offer-section { background-color:#2C2C2C; padding:15px 0; border-radius:10px; margin-bottom:25px; border:1px solid #3A3A3A; overflow:hidden;}
-        .offer-header { color:#FFD700; font-size:20px; margin-bottom:15px; text-align:center; padding-bottom:10px; border-bottom:1px solid rgba(255,215,0,0.2);}
-        #cpa-offer-wall-container { min-height:500px;}
-        .logout-btn { background-color: #dc3545; color: white; padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin-top: 15px; transition: background-color 0.3s; }
+        .link-button { 
+            display: block; 
+            padding: 20px; 
+            margin: 25px 0; 
+            background-color: #FFD700; /* لون ذهبي جذاب */
+            color: #121212; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 1.4em; 
+            font-weight: bold; 
+            text-decoration: none;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        .link-button:hover { 
+            background-color: #e0b400;
+            transform: translateY(-2px);
+        }
+        .logout-btn { 
+            background-color: #dc3545; color: white; padding: 8px 15px; 
+            border: none; border-radius: 6px; cursor: pointer; font-size: 14px; 
+            margin-top: 15px; transition: background-color 0.3s; 
+        }
         .logout-btn:hover { background-color: #c82333; }
     </style>
-    <script src="auth_handler.js"></script> 
 </head>
 <body>
 
 <div class="container">
-    <h1>مركز المهام لكسب المال (الدولار)</h1>
+    <h1>مرحباً بك في مركز الروابط</h1>
     
     <div class="user-info">
-        <p>مرحباً بك يا: <span id="username-display" style="color:#64ffda; font-weight:bold;">...</span></p>
-        <p>مُعرِّف المستخدم (ID): <span id="user-id-display">...</span></p>
+        <p>أهلاً يا: <span id="username-display" style="color:#64ffda; font-weight:bold;">...</span></p>
         <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
     </div>
 
-    <div class="balance-section">
-        <p>رصيدك الحالي من الدولارات (نقاط):</p>
-        <div id="balance-display">--.--</div>
-    </div>
+    <h2>اختر أحد المواقع لتبدأ الكسب:</h2>
     
-    <div class="offer-section">
-        <div class="offer-header">👑 GAME TASK 👑 | مكافآت اللعب بالدولار</div> 
-        <div id="cpa-offer-wall-container">
-            <p style="text-align:center; color:#ffeb3b; padding:20px;">جاري تحميل جدار العروض...</p>
-        </div>
-    </div>
+    <button class="link-button" id="timebucks-btn">TimeBucks</button>
+    
+    <button class="link-button" id="gemsloot-btn">GemsLoot</button>
+
+    <button class="link-button" id="freecash-btn">Freecash</button>
+
 </div>
 
 <script>
-    // ** 1. التحقق من حالة الدخول فوراً والـ API URL **
-    checkAuthAndRedirect(); // وظيفة موجودة في auth_handler.js
-
-    // رابط API الصحيح والنهائي
-    const API_URL = 'https://script.google.com/macros/s/AKfycbyI2G_WGjWfwrVG2NcEk1M7WOHer1lXdXsqpQA3XaHepDGwKjNwilyFgXwgTnErgvOoCQ/exec';
-    
-    // ID جدار العروض CPX Research (استخدم القيمة التي وضعتها في الكود السابق)
-    const APP_ID = '30033'; 
-
-    // جلب بيانات المستخدم المخزنة (المتغيرات التي تم الاتفاق عليها)
-    const userID = localStorage.getItem('game_user_id');
-    const username = localStorage.getItem('game_username');
-    
-    const balanceDisplay = document.getElementById('balance-display');
-    const cpaContainer = document.getElementById('cpa-offer-wall-container'); 
-
-    // ** 2. تهيئة الواجهة وعرض جدار العروض **
-    if (userID && username) {
-        document.getElementById('username-display').textContent = username;
-        document.getElementById('user-id-display').textContent = userID;
-
-        // رابط جدار CPX Research المصحح: يمرر ID المستخدم والاسم فقط (بدون الهاش الأمني المعقد)
-        const offerwallSrc = `https://offers.cpx-research.com/index.php?app_id=${APP_ID}&ext_user_id=${userID}&username=${encodeURIComponent(username)}`;
-
-        const iframeCode = `
-            <iframe 
-                sandbox='allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox' 
-                src='${offerwallSrc}' 
-                style='width:100%; height:2000px; border:none; display:block;' 
-                frameborder='0'>
-            </iframe>
-        `;
-        cpaContainer.innerHTML = iframeCode;
-        
-        // جلب الرصيد بعد تحميل الصفحة
-        fetchBalance(userID);
-    }
-
-    // ** 3. وظيفة جلب الرصيد من Apps Script **
-    async function fetchBalance(id) {
-        try {
-            const url = `${API_URL}?action=getBalance&id=${id}`;
-            const response = await fetch(url);
-            const data = await response.json();
-
-            if (data.status === 'success') {
-                // عرض الرصيد مع تنسيق الدولار
-                balanceDisplay.textContent = parseFloat(data.Balance).toFixed(2) + ' $';
-            } else {
-                balanceDisplay.textContent = 'خطأ';
-                console.error('Error fetching balance:', data.message);
-            }
-        } catch (error) {
-            balanceDisplay.textContent = 'خطأ اتصال';
-            console.error('Network Error:', error);
+    // ** 1. إعدادات روابط الإحالة (Affiliate Links) **
+    const affiliateLinks = {
+        // الموقع 1: TimeBucks (رابط ثابت)
+        timebucks: {
+            name: "TimeBucks",
+            url: "https://timebucks.com/?refID=227024124"
+        },
+        // الموقع 2: GemsLoot (يجب إضافة اسم المستخدم في نهايته)
+        gemsloot: {
+            name: "GemsLoot",
+            // نستخدم هذا الجزء ونضيف إليه اسم المستخدم (username) لاحقاً
+            url: "https://gemsloot.com/?aff=" 
+        },
+        // الموقع 3: Freecash (رابط ثابت)
+        freecash: {
+            name: "Freecash",
+            url: "https://freecash.com/r/ST6JL"
         }
+    };
+    
+    // ** 2. التحقق من حالة الدخول والمستخدم **
+    const username = localStorage.getItem('username'); // نستخدم 'username' فقط
+    
+    if (!username) {
+        // إذا لم يكن هناك اسم، أعد التوجيه لصفحة الدخول
+        window.location.href = 'login.html'; 
+    } else {
+        document.getElementById('username-display').textContent = username;
     }
 
-    // ** 4. وظيفة تسجيل الخروج **
+    // ** 3. ربط الأزرار والمنطق **
+    const timebucksBtn = document.getElementById('timebucks-btn');
+    const gemslootBtn = document.getElementById('gemsloot-btn');
+    const freecashBtn = document.getElementById('freecash-btn');
+
+    // ** TimeBucks (رابط ثابت) **
+    timebucksBtn.addEventListener('click', () => {
+        window.open(affiliateLinks.timebucks.url, '_blank'); 
+    });
+
+    // ** GemsLoot (رابط متغير يتطلب إضافة اسم المستخدم) **
+    gemslootBtn.addEventListener('click', () => {
+        // هنا نقوم بدمج الرابط الثابت مع اسم المستخدم (username) لتكوين رابط الإحالة النهائي
+        const finalUrl = affiliateLinks.gemsloot.url + username; 
+        window.open(finalUrl, '_blank'); 
+    });
+    
+    // ** Freecash (رابط ثابت) **
+    freecashBtn.addEventListener('click', () => {
+        window.open(affiliateLinks.freecash.url, '_blank'); 
+    });
+
+    // ** 4. وظيفة تسجيل الخروج البسيطة **
     function logout() {
-        localStorage.removeItem('game_user_id');
-        localStorage.removeItem('game_username');
-        // هنا يمكن إضافة مسح أي بيانات أخرى إذا لزم الأمر
+        localStorage.removeItem('username'); // مسح الاسم فقط
         window.location.href = 'login.html';
     }
 </script>
